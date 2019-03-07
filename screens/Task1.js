@@ -1,30 +1,69 @@
 import React from 'react';
 import {
-  Image,
+  Animated,
   Platform,
-  ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
-import { WebBrowser } from 'expo';
-
-import { MonoText } from '../components/StyledText';
-
+import { GestureHandler } from 'expo';
+const  { PanGestureHandler, State } = GestureHandler;
 export default class Task1 extends React.Component {
   static navigationOptions = {
     header: null,
   };
 
+  translateX = new Animated.Value(0)
+  translateY = new Animated.Value(0)
+  prevX = 0;
+  prevY = 0;
+
+  onGestureEvent=Animated.event(
+    [
+      {
+        nativeEvent: {
+          translationX: this.translateX,
+          translationY: this.translateY,
+        },
+      },
+    ],
+    { useNativeDriver: true }
+  );
+
+  onHandlerStateChange = ({ nativeEvent: { oldState, translationX, translationY }}) => {
+    if (oldState === State.ACTIVE) {
+      this.prevX += translationX;
+      this.prevY += translationY;
+      this.translateX.setValue(0)
+      this.translateY.setValue(0)
+      this.translateX.setOffset(this.prevX)
+      this.translateY.setOffset(this.prevY)
+    }
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.box}>
-          <Text>
-            Make me draggable
-          </Text>
-        </View>
+        <PanGestureHandler
+          onGestureEvent={this.onGestureEvent}
+          onHandlerStateChange={this.onHandlerStateChange}
+        >
+          <Animated.View
+            style={[
+              styles.box,
+              {
+                transform: [
+                  { translateX: this.translateX },
+                  { translateY: this.translateY },
+                ],
+              }
+            ]}
+          >
+            <Text>
+              Make me draggable
+            </Text>
+          </Animated.View>
+        </PanGestureHandler>
       </View>
     );
   }
