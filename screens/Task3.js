@@ -1,15 +1,25 @@
 import React from 'react';
 import {
-  Animated,
   Platform,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-import { GestureHandler } from 'expo';
+import Expo, { GestureHandler, DangerZone } from 'expo';
+const { Animated } = DangerZone;
+import Animated2 from 'react-native-reanimated'
 
 const { PanGestureHandler, State, PinchGestureHandler } = GestureHandler;
-
+const {
+  add,
+  cond,
+  event,
+  eq,
+  set,
+  debug,
+  call,
+  multiply
+} = Animated;
 
 export default class Task1 extends React.Component {
   static navigationOptions = {
@@ -18,8 +28,8 @@ export default class Task1 extends React.Component {
 
   translateX = new Animated.Value(0);
   translateY = new Animated.Value(0);
-  prevX = 0;
-  prevY = 0;
+  prevX = new Animated.Value(0);
+  prevY = new Animated.Value(0);
 
   onGestureEvent = Animated.event(
     [
@@ -30,36 +40,42 @@ export default class Task1 extends React.Component {
         },
       },
     ],
-    { useNativeDriver: true }
   );
 
-  onHandlerStateChange = ({ nativeEvent: { oldState, translationX, translationY } }) => {
-    if (oldState === State.ACTIVE) {
-      this.prevX += translationX;
-      this.prevY += translationY;
-      this.translateX.setValue(0);
-      this.translateY.setValue(0);
-      this.translateX.setOffset(this.prevX);
-      this.translateY.setOffset(this.prevY);
-    }
-  };
+  onHandlerStateChange = event([
+      {
+        nativeEvent: ({ oldState, translationX, translationY }) =>
+          cond(eq(oldState, State.ACTIVE),
+            [
+              set(this.prevX, add(this.prevX, translationX)),
+              set(this.prevY, add(this.prevY, translationY)),
+              set(this.translateX, 0),
+              set(this.translateY, 0)
+            ]
+          )
+      }
+    ])
+
 
   baseScale = new Animated.Value(1);
   pinchScale = new Animated.Value(1);
-  scale = Animated.multiply(this.baseScale, this.pinchScale);
+
   lastScale = 1;
-  onPinchGestureEvent = Animated.event(
-    [{ nativeEvent: { scale: this.pinchScale } }],
-    { useNativeDriver: true }
+  onPinchGestureEvent = event(
+    [{ nativeEvent: { scale: this.pinchScale } }]
   );
 
-  onPinchHandlerStateChange = event => {
-    if (event.nativeEvent.oldState === State.ACTIVE) {
-      this.lastScale *= event.nativeEvent.scale;
-      this.baseScale.setValue(this.lastScale);
-      this.pinchScale.setValue(1);
+  onPinchHandlerStateChange = event([
+    {
+      nativeEvent: ({ oldState, scale }) =>
+        cond(eq(oldState, State.ACTIVE),
+          [
+            set(this.baseScale, multiply(this.baseScale, scale)),
+            set(this.pinchScale, 1),
+          ]
+        )
     }
-  };
+  ]);
 
   pinch = React.createRef();
   pan = React.createRef();
@@ -71,7 +87,8 @@ export default class Task1 extends React.Component {
           ref={this.pinch}
           simultaneousHandlers={this.ref}
           onGestureEvent={this.onPinchGestureEvent}
-          onHandlerStateChange={this.onPinchHandlerStateChange}>
+          onHandlerStateChange={this.onPinchHandlerStateChange}
+        >
           <Animated.View>
             <PanGestureHandler
               ref={this.pan}
@@ -85,9 +102,9 @@ export default class Task1 extends React.Component {
                   {
                     transform: [
                       /*Does order matter?*/
-                      { scale: this.scale },
-                      { translateX: this.translateX },
-                      { translateY: this.translateY },
+                      { scale: multiply(this.baseScale, this.pinchScale) },
+                      { translateX: add(this.translateX, this.prevX) },
+                      { translateY: add(this.translateY, this.prevY) },
                     ],
                   }
                 ]}
