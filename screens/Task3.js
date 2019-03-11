@@ -5,9 +5,9 @@ import {
   Text,
   View,
 } from 'react-native';
-import Expo, { GestureHandler, DangerZone } from 'expo';
+import { GestureHandler, DangerZone } from 'expo';
 const { Animated } = DangerZone;
-import Animated2 from 'react-native-reanimated'
+// even better https://github.com/kmagiera/react-native-reanimated/blob/master/Example/PanRotateAndZoom/index.js
 
 const { PanGestureHandler, State, PinchGestureHandler } = GestureHandler;
 const {
@@ -16,8 +16,6 @@ const {
   event,
   eq,
   set,
-  debug,
-  call,
   multiply
 } = Animated;
 
