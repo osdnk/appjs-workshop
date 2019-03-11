@@ -7,8 +7,8 @@ import {
   View,
 } from 'react-native';
 import { GestureHandler } from 'expo';
-const  { PanGestureHandler, State } = GestureHandler;
 
+const { PanGestureHandler, State, PinchGestureHandler } = GestureHandler;
 
 
 export default class Task1 extends React.Component {
@@ -16,12 +16,12 @@ export default class Task1 extends React.Component {
     header: null,
   };
 
-  translateX = new Animated.Value(0)
-  translateY = new Animated.Value(0)
+  translateX = new Animated.Value(0);
+  translateY = new Animated.Value(0);
   prevX = 0;
   prevY = 0;
 
-  onGestureEvent=Animated.event(
+  onGestureEvent = Animated.event(
     [
       {
         nativeEvent: {
@@ -33,40 +33,72 @@ export default class Task1 extends React.Component {
     { useNativeDriver: true }
   );
 
-  onHandlerStateChange = ({ nativeEvent: { oldState, translationX, translationY }}) => {
+  onHandlerStateChange = ({ nativeEvent: { oldState, translationX, translationY } }) => {
     if (oldState === State.ACTIVE) {
       this.prevX += translationX;
       this.prevY += translationY;
-      this.translateX.setValue(0)
-      this.translateY.setValue(0)
-      this.translateX.setOffset(this.prevX)
-      this.translateY.setOffset(this.prevY)
+      this.translateX.setValue(0);
+      this.translateY.setValue(0);
+      this.translateX.setOffset(this.prevX);
+      this.translateY.setOffset(this.prevY);
     }
-  }
+  };
+
+  baseScale = new Animated.Value(1);
+  pinchScale = new Animated.Value(1);
+  scale = Animated.multiply(this.baseScale, this.pinchScale);
+  lastScale = 1;
+  onPinchGestureEvent = Animated.event(
+    [{ nativeEvent: { scale: this.pinchScale } }],
+    { useNativeDriver: true }
+  );
+
+  onPinchHandlerStateChange = event => {
+    if (event.nativeEvent.oldState === State.ACTIVE) {
+      this.lastScale *= event.nativeEvent.scale;
+      this.baseScale.setValue(this.lastScale);
+      this.pinchScale.setValue(1);
+    }
+  };
+
+  pinch = React.createRef();
+  pan = React.createRef();
 
   render() {
     return (
       <View style={styles.container}>
-        <PanGestureHandler
-          onGestureEvent={this.onGestureEvent}
-          onHandlerStateChange={this.onHandlerStateChange}
-        >
-          <Animated.View
-            style={[
-              styles.box,
-              {
-                transform: [
-                  { translateX: this.translateX },
-                  { translateY: this.translateY },
-                ],
-              }
-            ]}
-          >
-            <Text>
-              Add pinching
-            </Text>
+        <PinchGestureHandler
+          ref={this.pinch}
+          simultaneousHandlers={this.ref}
+          onGestureEvent={this.onPinchGestureEvent}
+          onHandlerStateChange={this.onPinchHandlerStateChange}>
+          <Animated.View>
+            <PanGestureHandler
+              ref={this.pan}
+              simultaneousHandlers={this.pinch}
+              onGestureEvent={this.onGestureEvent}
+              onHandlerStateChange={this.onHandlerStateChange}
+            >
+              <Animated.View
+                style={[
+                  styles.box,
+                  {
+                    transform: [
+                      /*Does order matter?*/
+                      { scale: this.scale },
+                      { translateX: this.translateX },
+                      { translateY: this.translateY },
+                    ],
+                  }
+                ]}
+              >
+                <Text>
+                  Add pinching
+                </Text>
+              </Animated.View>
+            </PanGestureHandler>
           </Animated.View>
-        </PanGestureHandler>
+        </PinchGestureHandler>
       </View>
     );
   }
