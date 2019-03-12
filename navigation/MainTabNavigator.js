@@ -7,6 +7,7 @@ import Task1 from '../screens/Task1';
 import Task2 from '../screens/Task2';
 import Task3 from '../screens/Task3';
 import Task4 from '../screens/Task4';
+import Task5 from '../screens/Task5';
 import LinksScreen from '../screens/LinksScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 
@@ -101,6 +102,7 @@ export default createBottomTabNavigator({
   Task2,
   Task3,
   Task4,
+  Task5,
   LinksStack,
   SettingsStack,
 });
