@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, Text } from 'react-native'
-import { GestureHandler, DangerZone } from 'expo'
+import { StyleSheet, View } from 'react-native'
+import { DangerZone, GestureHandler } from 'expo'
 import { CliectSays } from './ClientSays'
+
 const { Animated } = DangerZone
 const {
   PanGestureHandler,

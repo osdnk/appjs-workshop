@@ -1,13 +1,9 @@
 import React from 'react'
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native'
-import { GestureHandler, DangerZone } from 'expo'
+import { StyleSheet, View, } from 'react-native'
+import { DangerZone, GestureHandler } from 'expo'
 import { CliectSays } from './ClientSays'
 import { MonoText } from '../components/StyledText'
+
 const { Animated } = DangerZone
 
 const { PanGestureHandler, State, PinchGestureHandler } = GestureHandler

@@ -1,11 +1,5 @@
 import React from 'react'
-import {
-  Animated,
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native'
+import { Animated, StyleSheet, View, } from 'react-native'
 import { GestureHandler } from 'expo'
 import { CliectSays } from './ClientSays'
 

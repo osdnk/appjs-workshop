@@ -4,7 +4,9 @@ module.exports = {
         "es6": true
     },
     "parser": "babel-eslint",
-    "extends": "eslint:recommended",
+    'extends': [
+      'plugin:react/recommended'
+    ],
     "parserOptions": {
         "ecmaFeatures": {
             "jsx": true
@@ -24,9 +26,6 @@ module.exports = {
           0,
           80,
         ],
-        "no-console": [
-          0
-        ],
         "no-undef": [
           0
         ],
@@ -42,8 +41,8 @@ module.exports = {
             "error",
             "never"
         ],
-        "no-unused-vars": [
-          0
+        "react/prop-types": [
+            0
         ]
     }
 };

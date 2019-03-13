@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
-import { StyleSheet, View, Text } from 'react-native'
-import { GestureHandler, DangerZone } from 'expo'
+import { StyleSheet, View } from 'react-native'
+import { DangerZone, GestureHandler } from 'expo'
+import { CliectSays } from './ClientSays'
+
 const { Animated } = DangerZone
 const {
   PanGestureHandler,
@@ -8,7 +10,70 @@ const {
   State,
 } = GestureHandler
 
-const { set, cond, block, eq, add, spring, and, Value, call, or, divide, sqrt, greaterThan, sub,event, diff, multiply, debug, clockRunning, startClock, stopClock, decay, Clock, lessThan } = Animated
+const { set, cond, block, eq, add, and, sqrt, Value, spring, or, divide, greaterThan, sub,event, diff, multiply, clockRunning, startClock, stopClock, decay, Clock, lessThan } = Animated
+
+function withEnhancedLimits(val, min, max, state) {
+  const prev = new Animated.Value(0)
+  const limitedVal = new Animated.Value(0)
+  const flagWasRunSpring = new Animated.Value(0)
+  const springClock = new Clock()
+  return block([
+    cond(eq(state, State.BEGAN),[
+      set(prev, val),
+      set(flagWasRunSpring, 0),
+      stopClock(springClock)
+    ], [
+      cond(or(and(eq(state, State.END), or(lessThan(limitedVal, min), greaterThan(limitedVal, max))), flagWasRunSpring),
+        [
+          set(flagWasRunSpring, 1),
+          cond(lessThan(limitedVal, min),
+            set(limitedVal, runSpring(springClock, limitedVal, diff(limitedVal), min))
+          ),
+          cond(greaterThan(limitedVal, max),
+            set(limitedVal, runSpring(springClock, limitedVal, diff(limitedVal), max))
+          ),
+        ],
+        [
+          set(limitedVal, add(limitedVal, sub(val, prev))),
+          cond(and(lessThan(limitedVal, min), lessThan(val, prev)),
+            // derivate of sqrt
+            [
+              // revert
+              set(limitedVal, add(limitedVal, sub(prev, val))),
+              // and use derivative of sqrt(x)
+              set(limitedVal,
+                sub(limitedVal,
+                  multiply(
+                    (divide(1, multiply(2, sqrt(sub(min, sub(limitedVal, sub(prev, val))))))),
+                    (sub(prev, val))
+                  )
+                )
+              ),
+            ]
+          ),
+          cond(and(greaterThan(limitedVal, max), greaterThan(val, prev)),
+            // derivate of sqrt
+            [
+              // revert
+              set(limitedVal, add(limitedVal, sub(prev, val))),
+              // and use derivative of sqrt(x)
+              set(limitedVal,
+                add(limitedVal,
+                  multiply(
+                    (divide(1, multiply(2, sqrt(sub(add(limitedVal, sub(val, prev)), max))))),
+                    (sub(val, prev))
+                  )
+                )
+              ),
+            ]
+          ),
+          set(prev, val),
+        ]
+      ),
+    ]),
+    limitedVal,
+  ])
+}
 
 function runDecay(clock, value, velocity, wasStartedFromBegin) {
   const state = {
@@ -36,6 +101,59 @@ function runDecay(clock, value, velocity, wasStartedFromBegin) {
     cond(state.finished, stopClock(clock)),
     state.position,
   ]
+}
+
+function withPreservingMultiplicativeOffset (val, state) {
+  const prev = new Animated.Value(1)
+  const valWithPreservedOffset = new Animated.Value(1)
+  return block([
+    cond(eq(state, State.BEGAN), [
+      set(prev, 1)
+    ], [
+      set(valWithPreservedOffset, multiply(valWithPreservedOffset, divide(val, prev))),
+      set(prev, val),
+    ]),
+    valWithPreservedOffset
+  ])
+}
+
+function withPreservingAdditiveOffset(drag, state) {
+  const prev = new Animated.Value(0)
+  const valWithPreservedOffset = new Animated.Value(0)
+  return block([
+    cond(eq(state, State.BEGAN), [
+      set(prev, 0)
+    ], [
+      set(valWithPreservedOffset, add(valWithPreservedOffset, sub(drag, prev))),
+      set(prev, drag),
+    ]),
+    valWithPreservedOffset
+  ])
+}
+
+function withDecaying(drag, state){
+  const valDecayed = new Animated.Value(0)
+  const offset = new Animated.Value(0)
+  const decayClock = new Clock()
+  // since there might be moar than one clock
+  const wasStartedFromBegin = new Animated.Value(0)
+  return block([
+    cond(eq(state, State.END),
+      [
+        set(valDecayed, runDecay(decayClock, add(drag, offset), diff(drag), wasStartedFromBegin))
+      ],
+      [
+        stopClock(decayClock),
+        cond(eq(state, State.BEGAN), [
+          set(wasStartedFromBegin, 0),
+          set(offset, add(sub(valDecayed, drag)))
+        ]),
+        set(valDecayed, add(drag, offset))
+
+      ],
+    ),
+    valDecayed,
+  ])
 }
 
 
@@ -71,19 +189,24 @@ function runSpring(clock, value, velocity, dest) {
   ]
 }
 
+
+function withLimits(val, min, max, state){
+  const offset = new Animated.Value(0)
+  const offsetedVal = add(offset, val)
+  return block([
+    cond(eq(state, State.BEGAN),[
+      cond(lessThan(offsetedVal, min),
+        set(offset, sub(min, val))),
+      cond(greaterThan(offsetedVal, max),
+        set(offset, sub(max, val)))
+    ]),
+    cond(lessThan(offsetedVal, min), min, cond(greaterThan(offsetedVal, max), max, offsetedVal))
+  ])
+}
+
 export default class Example extends Component {
   constructor(props) {
     super(props)
-
-    this.Y = new Value(0)
-    this.R = new Value(0)
-    this.Z = new Value(1)
-    const prevX = new Value(0)
-    const prevY = new Value(0)
-    const prevZ = new Value(1)
-    const decayClockX = new Clock()
-    const decayClockY = new Clock()
-
     const dragX = new Value(0)
     const dragY = new Value(0)
     const scale = new Value(1)
@@ -110,161 +233,9 @@ export default class Example extends Component {
       },
     ])
 
-    const withPreservingMultiplicativeOffset = (val, state) => {
-      const prev = new Animated.Value(1)
-      const valWithPreservedOffset = new Animated.Value(1)
-      return block([
-        cond(eq(state, State.BEGAN), [
-          set(prev, 1)
-        ], [
-          set(valWithPreservedOffset, multiply(valWithPreservedOffset, divide(val, prev))),
-          set(prev, val),
-        ]),
-        valWithPreservedOffset
-      ])
-    }
-
-    const withPreservingAdditiveOffset = (drag, state) => {
-      const prev = new Animated.Value(0)
-      const valWithPreservedOffset = new Animated.Value(0)
-      return block([
-        cond(eq(state, State.BEGAN), [
-          set(prev, 0)
-        ], [
-          set(valWithPreservedOffset, add(valWithPreservedOffset, sub(drag, prev))),
-          set(prev, drag),
-        ]),
-        valWithPreservedOffset
-      ])
-    }
-
-    const withDecaying = (drag, state) => {
-      const valDecayed = new Animated.Value(0)
-      const offset = new Animated.Value(0)
-      const decayClock = new Clock()
-      const wasStartedFromBegin = new Animated.Value(0)
-      return block([
-        cond(eq(state, State.END),
-          [
-            set(valDecayed, runDecay(decayClock, add(drag, offset), diff(drag), wasStartedFromBegin))
-          ],
-          [
-            stopClock(decayClock),
-            cond(eq(state, State.BEGAN), [
-              set(wasStartedFromBegin, 0),
-              set(offset, add(sub(valDecayed, drag)))
-            ]),
-            set(valDecayed, add(drag, offset))
-
-          ],
-        ),
-        valDecayed,
-      ])
-    }
-
-
-    const withBouncy = condition => (val, bound, state) => {
-      const offset = new Animated.Value(0)
-      const offsetedVal = add(offset, val)
-      return block([
-        cond(and(eq(state, State.BEGAN), condition(offsetedVal, bound)),[
-          set(offset, sub(bound, val)),
-        ]),
-        cond(condition(offsetedVal, bound), bound, offsetedVal)
-      ])
-    }
-
-    const withBouncyMin = withBouncy(lessThan)
-    const withBouncyMax = withBouncy(greaterThan)
-
-    const withLimits = (val, min, max, state) => {
-      const offset = new Animated.Value(0)
-      const offsetedVal = add(offset, val)
-      return block([
-        cond(eq(state, State.BEGAN),[
-          cond(lessThan(offsetedVal, min),
-            set(offset, sub(min, val))),
-          cond(greaterThan(offsetedVal, max),
-            set(offset, sub(max, val)))
-        ]),
-        cond(lessThan(offsetedVal, min), min, cond(greaterThan(offsetedVal, max), max, offsetedVal))
-      ])
-    }
-
-    const withEnhancedLimits = (val, min, max, state) => {
-      const offset = new Animated.Value(0)
-      const prev = new Animated.Value(0)
-      const offsetedVal = add(offset, val)
-      const limitedVal = new Animated.Value(0)
-      const bouncyVal = new Animated.Value(0)
-      const flagWasRunSping = new Animated.Value(0)
-      const springClock = new Clock()
-      return block([
-        cond(eq(state, State.BEGAN),[
-          set(prev, val),
-          set(flagWasRunSping, 0),
-          stopClock(springClock)
-        ], [
-          cond(or(and(eq(state, State.END), or(lessThan(limitedVal, min), greaterThan(limitedVal, max))), flagWasRunSping),
-            [
-              set(flagWasRunSping, 1),
-              cond(lessThan(limitedVal, min),
-                set(limitedVal, runSpring(springClock, limitedVal, diff(limitedVal), min))
-              ),
-              cond(greaterThan(limitedVal, max),
-                set(limitedVal, runSpring(springClock, limitedVal, diff(limitedVal), max))
-              ),
-            ],
-            [
-              set(limitedVal, add(limitedVal, sub(val, prev))),
-              cond(and(lessThan(limitedVal, min), lessThan(val, prev)),
-                // derivate of sqrt
-                [
-                  // revert
-                  set(limitedVal, add(limitedVal, sub(prev, val))),
-                  // and use derivative of sqrt(x)
-                  set(limitedVal,
-                    sub(limitedVal,
-                      multiply(
-                        (divide(1, multiply(2, sqrt(sub(min, sub(limitedVal, sub(prev, val))))))),
-                        (sub(prev, val))
-                      )
-                    )
-                  ),
-                ]
-              ),
-              cond(and(greaterThan(limitedVal, max), greaterThan(val, prev)),
-                // derivate of sqrt
-                [
-                  // revert
-                  set(limitedVal, add(limitedVal, sub(prev, val))),
-                  // and use derivative of sqrt(x)
-                  set(limitedVal,
-                    add(limitedVal,
-                      multiply(
-                        (divide(1, multiply(2, sqrt(sub(add(limitedVal, sub(val, prev)), max))))),
-                        (sub(val, prev))
-                      )
-                    )
-                  ),
-                ]
-              ),
-              /* cond(greaterThan(limitedVal, max),
-                set(bouncyVal, min)
-              ),*/
-              set(prev, val),
-            ]
-          ),
-        ]),
-        limitedVal,
-      ])
-    }
-
-
     this.X = withEnhancedLimits(withDecaying(withPreservingAdditiveOffset(dragX, panState), panState), -100, 100, panState)
     this.Y = withEnhancedLimits(withDecaying(withPreservingAdditiveOffset(dragY, panState), panState), -100, 100, panState)
-    this.Z = withLimits(withPreservingMultiplicativeOffset(scale, scaleState), 0.1, 2, scaleState)
-
+    this.scale = withLimits(withPreservingMultiplicativeOffset(scale, scaleState), 0.1, 2, scaleState)
   }
 
   panRef = React.createRef();
@@ -273,9 +244,13 @@ export default class Example extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text>
-          Make dacays
-        </Text>
+        <CliectSays
+          text="Hi! Hi! I know you're in hurry for your wife's birthday (best wished btw!)
+          but there's one more feature I could find useful. I want component to stop on meeting
+          limits but to slow down (e.g. use sqrt of movement) and then slightly move to
+          limits on finger released. It should be very easy for you! (deploy tomorrow btw but no pressure).
+          Cheers! "
+        />
         <PanGestureHandler
           ref={this.panRef}
           simultaneousHandlers={[this.pinchRef]}
@@ -296,14 +271,12 @@ export default class Example extends Component {
                     transform: [
                       { translateX: this.X },
                       { translateY: this.Y },
-                      { scale: this.Z },
+                      { scale: this.scale },
                     ],
                   },
                 ]}
                 source={require('./react-hexagon.png')}
               />
-
-
             </PinchGestureHandler>
           </Animated.View>
         </PanGestureHandler>

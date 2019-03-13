@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react'
 import { TouchableOpacity, View } from 'react-native'
 import { Icon } from 'expo'
