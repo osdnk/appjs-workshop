@@ -7,21 +7,18 @@ import {
   View,
 } from 'react-native'
 import { GestureHandler } from 'expo'
+import { CliectSays } from './ClientSays'
 
-const { PanGestureHandler, State, PinchGestureHandler } = GestureHandler
+const { PanGestureHandler, State, PinchGestureHandler, RotationGestureHandler } = GestureHandler
 
 
 export default class Task1 extends React.Component {
-  static navigationOptions = {
-    header: null,
-  };
-
   translateX = new Animated.Value(0);
   translateY = new Animated.Value(0);
   prevX = 0;
   prevY = 0;
 
-  onGestureEvent = Animated.event(
+  onPanGestureEvent = Animated.event(
     [
       {
         nativeEvent: {
@@ -33,7 +30,7 @@ export default class Task1 extends React.Component {
     { useNativeDriver: true }
   );
 
-  onHandlerStateChange = ({ nativeEvent: { oldState, translationX, translationY } }) => {
+  onPanHandlerStateChange = ({ nativeEvent: { oldState, translationX, translationY } }) => {
     if (oldState === State.ACTIVE) {
       this.prevX += translationX
       this.prevY += translationY
@@ -61,44 +58,76 @@ export default class Task1 extends React.Component {
     }
   };
 
+  baseRotation = new Animated.Value(0);
+  zoomRotation = new Animated.Value(0);
+  rotation = Animated.add(this.baseRotation, this.zoomRotation);
+  lastRotation = 0;
+  onRotationGestureEvent = Animated.event(
+    [{ nativeEvent: { rotation: this.zoomRotation } }],
+    { useNativeDriver: true }
+  );
+
+  rotationString = this.rotation.interpolate({
+    inputRange: [-100, 100],
+    outputRange: ['-100rad', '100rad'],
+  });
+
+  onRotationHandlerStateChange = event => {
+    if (event.nativeEvent.oldState === State.ACTIVE) {
+      this.lastRotation += event.nativeEvent.rotation
+      this.baseRotation.setValue(this.lastRotation)
+      this.zoomRotation.setValue(0)
+    }
+  };
+
   pinch = React.createRef();
   pan = React.createRef();
+  rotate = React.createRef();
 
   render() {
     return (
       <View style={styles.container}>
-        <PinchGestureHandler
-          ref={this.pinch}
-          simultaneousHandlers={this.ref}
-          onGestureEvent={this.onPinchGestureEvent}
-          onHandlerStateChange={this.onPinchHandlerStateChange}>
+        <CliectSays
+          text="Wow! Thanks. I think I need also to have this box resizeable.
+          I mean I want to be able to pinch to zoom.
+          And maybe rotating with gesture? "
+        />
+        <RotationGestureHandler
+          ref={this.rotate}
+          simultaneousHandlers={[this.pan, this.pinch]}
+          onGestureEvent={this.onRotationGestureEvent}
+          onHandlerStateChange={this.onRotationHandlerStateChange}>
           <Animated.View>
-            <PanGestureHandler
-              ref={this.pan}
-              simultaneousHandlers={this.pinch}
-              onGestureEvent={this.onGestureEvent}
-              onHandlerStateChange={this.onHandlerStateChange}
-            >
-              <Animated.View
-                style={[
-                  styles.box,
-                  {
-                    transform: [
-                      /*Does order matter?*/
-                      { scale: this.scale },
-                      { translateX: this.translateX },
-                      { translateY: this.translateY },
-                    ],
-                  }
-                ]}
-              >
-                <Text>
-                  Add pinching
-                </Text>
+            <PinchGestureHandler
+              ref={this.pinch}
+              simultaneousHandlers={[this.rotate, this.pinch]}
+              onGestureEvent={this.onPinchGestureEvent}
+              onHandlerStateChange={this.onPinchHandlerStateChange}>
+              <Animated.View>
+                <PanGestureHandler
+                  ref={this.pan}
+                  simultaneousHandlers={[this.pinch, this.rotate]}
+                  onGestureEvent={this.onPanGestureEvent}
+                  onHandlerStateChange={this.onPanHandlerStateChange}
+                >
+                  <Animated.View
+                    style={[
+                      styles.box,
+                      {
+                        transform: [
+                          { rotate: this.rotationString },
+                          { scale: this.scale },
+                          { translateX: this.translateX },
+                          { translateY: this.translateY },
+                        ],
+                      }
+                    ]}
+                  />
+                </PanGestureHandler>
               </Animated.View>
-            </PanGestureHandler>
+            </PinchGestureHandler>
           </Animated.View>
-        </PinchGestureHandler>
+        </RotationGestureHandler>
       </View>
     )
   }
@@ -111,91 +140,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
-  developmentModeText: {
-    marginBottom: 20,
-    color: 'rgba(0,0,0,0.4)',
-    fontSize: 14,
-    lineHeight: 19,
-    textAlign: 'center',
-  },
   box: {
     width: 100,
     backgroundColor: 'yellow',
     height: 100,
-  },
-  contentContainer: {
-    paddingTop: 30,
-  },
-  welcomeContainer: {
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  welcomeImage: {
-    width: 100,
-    height: 80,
-    resizeMode: 'contain',
-    marginTop: 3,
-    marginLeft: -10,
-  },
-  getStartedContainer: {
-    alignItems: 'center',
-    marginHorizontal: 50,
-  },
-  homeScreenFilename: {
-    marginVertical: 7,
-  },
-  codeHighlightText: {
-    color: 'rgba(96,100,109, 0.8)',
-  },
-  codeHighlightContainer: {
-    backgroundColor: 'rgba(0,0,0,0.05)',
-    borderRadius: 3,
-    paddingHorizontal: 4,
-  },
-  getStartedText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    lineHeight: 24,
-    textAlign: 'center',
-  },
-  tabBarInfoContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    ...Platform.select({
-      ios: {
-        shadowColor: 'black',
-        shadowOffset: { height: -3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-      },
-      android: {
-        elevation: 20,
-      },
-    }),
-    alignItems: 'center',
-    backgroundColor: '#fbfbfb',
-    paddingVertical: 20,
-  },
-  tabBarInfoText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    textAlign: 'center',
-  },
-  navigationFilename: {
-    marginTop: 5,
-  },
-  helpContainer: {
-    marginTop: 15,
-    alignItems: 'center',
-  },
-  helpLink: {
-    paddingVertical: 15,
-  },
-  helpLinkText: {
-    fontSize: 14,
-    color: '#2e78b7',
   },
 })

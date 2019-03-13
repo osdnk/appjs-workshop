@@ -8,101 +8,32 @@ import Task2 from '../screens/Task2'
 import Task3 from '../screens/Task3'
 import Task4 from '../screens/Task4'
 import Task5 from '../screens/Task5'
-import LinksScreen from '../screens/LinksScreen'
-import SettingsScreen from '../screens/SettingsScreen'
+import Task6 from '../screens/Task6'
 
-Task1.navigationOptions = {
-  tabBarLabel: 'Task1',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={
-        Platform.OS === 'ios'
-          ? `ios-information-circle${focused ? '' : '-outline'}`
-          : 'md-information-circle'
-      }
-    />
-  ),
-}
+const enhance = (Component, name) => {
+  Component.navigationOptions = {
+    tabBarLabel: name,
+    header: null,
+    tabBarIcon: ({ focused }) => (
+      <TabBarIcon
+        focused={focused}
+        name={
+          Platform.OS === 'ios'
+            ? `ios-information-circle${focused ? '' : '-outline'}`
+            : 'md-information-circle'
+        }
+      />
+    ),
+  }
 
-Task2.navigationOptions = {
-  tabBarLabel: 'Task2',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={
-        Platform.OS === 'ios'
-          ? `ios-information-circle${focused ? '' : '-outline'}`
-          : 'md-information-circle'
-      }
-    />
-  ),
-}
-
-Task3.navigationOptions = {
-  tabBarLabel: 'Task3',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={
-        Platform.OS === 'ios'
-          ? `ios-information-circle${focused ? '' : '-outline'}`
-          : 'md-information-circle'
-      }
-    />
-  ),
-}
-
-
-Task4.navigationOptions = {
-  tabBarLabel: 'Task3',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={
-        Platform.OS === 'ios'
-          ? `ios-information-circle${focused ? '' : '-outline'}`
-          : 'md-information-circle'
-      }
-    />
-  ),
-}
-
-
-const LinksStack = createStackNavigator({
-  Links: LinksScreen,
-})
-
-LinksStack.navigationOptions = {
-  tabBarLabel: 'Links',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={Platform.OS === 'ios' ? 'ios-link' : 'md-link'}
-    />
-  ),
-}
-
-const SettingsStack = createStackNavigator({
-  Settings: SettingsScreen,
-})
-
-SettingsStack.navigationOptions = {
-  tabBarLabel: 'Settings',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'}
-    />
-  ),
+  return Component
 }
 
 export default createBottomTabNavigator({
-  Task1,
-  Task2,
-  Task3,
-  Task4,
-  Task5,
-  LinksStack,
-  SettingsStack,
+  Task1: enhance(Task1, 'Task 1'),
+  Task2: enhance(Task2, 'Task 2'),
+  Task3: enhance(Task3, 'Task 3'),
+  Task4: enhance(Task4, 'Task 4'),
+  Task5: enhance(Task5, 'Task 5'),
+  Task6: enhance(Task6, 'Task 6'),
 })
