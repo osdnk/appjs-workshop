@@ -1,14 +1,14 @@
-import React from 'react';
+import React from 'react'
 import {
   Animated,
   Platform,
   StyleSheet,
   Text,
   View,
-} from 'react-native';
-import { GestureHandler } from 'expo';
+} from 'react-native'
+import { GestureHandler } from 'expo'
 
-const { PanGestureHandler, State, PinchGestureHandler } = GestureHandler;
+const { PanGestureHandler, State, PinchGestureHandler } = GestureHandler
 
 
 export default class Task1 extends React.Component {
@@ -35,12 +35,12 @@ export default class Task1 extends React.Component {
 
   onHandlerStateChange = ({ nativeEvent: { oldState, translationX, translationY } }) => {
     if (oldState === State.ACTIVE) {
-      this.prevX += translationX;
-      this.prevY += translationY;
-      this.translateX.setValue(0);
-      this.translateY.setValue(0);
-      this.translateX.setOffset(this.prevX);
-      this.translateY.setOffset(this.prevY);
+      this.prevX += translationX
+      this.prevY += translationY
+      this.translateX.setValue(0)
+      this.translateY.setValue(0)
+      this.translateX.setOffset(this.prevX)
+      this.translateY.setOffset(this.prevY)
     }
   };
 
@@ -55,9 +55,9 @@ export default class Task1 extends React.Component {
 
   onPinchHandlerStateChange = event => {
     if (event.nativeEvent.oldState === State.ACTIVE) {
-      this.lastScale *= event.nativeEvent.scale;
-      this.baseScale.setValue(this.lastScale);
-      this.pinchScale.setValue(1);
+      this.lastScale *= event.nativeEvent.scale
+      this.baseScale.setValue(this.lastScale)
+      this.pinchScale.setValue(1)
     }
   };
 
@@ -100,7 +100,7 @@ export default class Task1 extends React.Component {
           </Animated.View>
         </PinchGestureHandler>
       </View>
-    );
+    )
   }
 }
 
@@ -198,4 +198,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#2e78b7',
   },
-});
+})

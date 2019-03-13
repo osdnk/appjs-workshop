@@ -1,15 +1,15 @@
-import React from 'react';
-import { Platform } from 'react-native';
-import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
+import React from 'react'
+import { Platform } from 'react-native'
+import { createStackNavigator, createBottomTabNavigator } from 'react-navigation'
 
-import TabBarIcon from '../components/TabBarIcon';
-import Task1 from '../screens/Task1';
-import Task2 from '../screens/Task2';
-import Task3 from '../screens/Task3';
-import Task4 from '../screens/Task4';
-import Task5 from '../screens/Task5';
-import LinksScreen from '../screens/LinksScreen';
-import SettingsScreen from '../screens/SettingsScreen';
+import TabBarIcon from '../components/TabBarIcon'
+import Task1 from '../screens/Task1'
+import Task2 from '../screens/Task2'
+import Task3 from '../screens/Task3'
+import Task4 from '../screens/Task4'
+import Task5 from '../screens/Task5'
+import LinksScreen from '../screens/LinksScreen'
+import SettingsScreen from '../screens/SettingsScreen'
 
 Task1.navigationOptions = {
   tabBarLabel: 'Task1',
@@ -23,7 +23,7 @@ Task1.navigationOptions = {
       }
     />
   ),
-};
+}
 
 Task2.navigationOptions = {
   tabBarLabel: 'Task2',
@@ -37,7 +37,7 @@ Task2.navigationOptions = {
       }
     />
   ),
-};
+}
 
 Task3.navigationOptions = {
   tabBarLabel: 'Task3',
@@ -51,7 +51,7 @@ Task3.navigationOptions = {
       }
     />
   ),
-};
+}
 
 
 Task4.navigationOptions = {
@@ -66,12 +66,12 @@ Task4.navigationOptions = {
       }
     />
   ),
-};
+}
 
 
 const LinksStack = createStackNavigator({
   Links: LinksScreen,
-});
+})
 
 LinksStack.navigationOptions = {
   tabBarLabel: 'Links',
@@ -81,11 +81,11 @@ LinksStack.navigationOptions = {
       name={Platform.OS === 'ios' ? 'ios-link' : 'md-link'}
     />
   ),
-};
+}
 
 const SettingsStack = createStackNavigator({
   Settings: SettingsScreen,
-});
+})
 
 SettingsStack.navigationOptions = {
   tabBarLabel: 'Settings',
@@ -95,7 +95,7 @@ SettingsStack.navigationOptions = {
       name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'}
     />
   ),
-};
+}
 
 export default createBottomTabNavigator({
   Task1,
@@ -105,4 +105,4 @@ export default createBottomTabNavigator({
   Task5,
   LinksStack,
   SettingsStack,
-});
+})

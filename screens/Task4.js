@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
-import { GestureHandler, DangerZone } from 'expo';
-const { Animated } = DangerZone;
+import React, { Component } from 'react'
+import { StyleSheet, View, Text } from 'react-native'
+import { GestureHandler, DangerZone } from 'expo'
+const { Animated } = DangerZone
 const {
   PanGestureHandler,
   PinchGestureHandler,
@@ -9,7 +9,7 @@ const {
   State,
 } = GestureHandler
 
-const { set, cond, block, eq, add, or, Value, call, sub,event, diff, multiply, debug, clockRunning, startClock, stopClock, decay, Clock } = Animated;
+const { set, cond, block, eq, add, or, Value, call, sub,event, diff, multiply, debug, clockRunning, startClock, stopClock, decay, Clock } = Animated
 
 function runDecay(clock, value, velocity, wasStartedFromBegin) {
   const state = {
@@ -17,9 +17,9 @@ function runDecay(clock, value, velocity, wasStartedFromBegin) {
     velocity: new Value(0),
     position: new Value(0),
     time: new Value(0),
-  };
+  }
 
-  const config = { deceleration: 0.99 };
+  const config = { deceleration: 0.99 }
 
   return [
     cond(clockRunning(clock), 0, [
@@ -32,29 +32,29 @@ function runDecay(clock, value, velocity, wasStartedFromBegin) {
         startClock(clock),
       ]),
     ]),
-   // set(state.position, value),
+    // set(state.position, value),
     decay(clock, state, config),
     cond(state.finished, stopClock(clock)),
     state.position,
-  ];
+  ]
 }
 
 export default class Example extends Component {
   constructor(props) {
-    super(props);
+    super(props)
 
-    this.Y = new Value(0);
-    this.R = new Value(0);
-    this.Z = new Value(1);
-    const prevX = new Value(0);
-    const prevY = new Value(0);
-    const prevZ = new Value(1);
-    const decayClockX = new Clock();
-    const decayClockY = new Clock();
+    this.Y = new Value(0)
+    this.R = new Value(0)
+    this.Z = new Value(1)
+    const prevX = new Value(0)
+    const prevY = new Value(0)
+    const prevZ = new Value(1)
+    const decayClockX = new Clock()
+    const decayClockY = new Clock()
 
-    const dragX = new Value(0);
-    const dragY = new Value(0);
-    const panState = new Value(0);
+    const dragX = new Value(0)
+    const dragY = new Value(0)
+    const panState = new Value(0)
 
 
     this.handlePan = event([
@@ -65,7 +65,7 @@ export default class Example extends Component {
           state: panState
         })
       },
-    ]);
+    ])
 
     this.handleZoom = event([
       {
@@ -75,11 +75,11 @@ export default class Example extends Component {
             cond(eq(state, State.END), [set(prevZ, this.Z)]),
           ]),
       },
-    ]);
+    ])
 
     const withPreservingOffset = (drag, state) => {
-      const prev = new Animated.Value(0);
-      const valWithPreservedOffset = new Animated.Value(0);
+      const prev = new Animated.Value(0)
+      const valWithPreservedOffset = new Animated.Value(0)
       return block([
         cond(eq(state, State.BEGAN), [
           set(prev, 0)
@@ -88,21 +88,20 @@ export default class Example extends Component {
           set(prev, drag),
         ]),
         valWithPreservedOffset
-      ]);
+      ])
     }
 
     const withDecaying = (drag, state) => {
-      const valDecayed = new Animated.Value(0);
-      const offset = new Animated.Value(0);
-      const decayClock = new Clock();
-      const wasStartedFromBegin = new Animated.Value(0);
+      const valDecayed = new Animated.Value(0)
+      const offset = new Animated.Value(0)
+      const decayClock = new Clock()
+      const wasStartedFromBegin = new Animated.Value(0)
       return block([
         cond(eq(state, State.END),
           [
             set(valDecayed, runDecay(decayClock, add(drag, offset), diff(drag), wasStartedFromBegin))
           ],
           [
-
             cond(eq(state, State.BEGAN), [
               set(wasStartedFromBegin, 0),
               set(offset, add(sub(valDecayed, drag)))
@@ -143,31 +142,31 @@ export default class Example extends Component {
               onGestureEvent={this.handleZoom}
               onHandlerStateChange={this.handleZoom}>
 
-                  <Animated.Image
-                    resizeMode="contain"
-                    style={[
-                      styles.box,
-                      {
-                        transform: [
-                          { translateX: this.X },
-                          { translateY: this.Y },
-                          { scale: this.Z },
-                        ],
-                      },
-                    ]}
-                    source={require('./react-hexagon.png')}
-                  />
+              <Animated.Image
+                resizeMode="contain"
+                style={[
+                  styles.box,
+                  {
+                    transform: [
+                      { translateX: this.X },
+                      { translateY: this.Y },
+                      { scale: this.Z },
+                    ],
+                  },
+                ]}
+                source={require('./react-hexagon.png')}
+              />
 
 
             </PinchGestureHandler>
           </Animated.View>
         </PanGestureHandler>
       </View>
-    );
+    )
   }
 }
 
-const IMAGE_SIZE = 200;
+const IMAGE_SIZE = 200
 
 const styles = StyleSheet.create({
   container: {
@@ -180,5 +179,5 @@ const styles = StyleSheet.create({
     width: IMAGE_SIZE,
     height: IMAGE_SIZE,
   },
-});
+})
 

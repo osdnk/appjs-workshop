@@ -1,15 +1,15 @@
-import React from 'react';
+import React from 'react'
 import {
   Platform,
   StyleSheet,
   Text,
   View,
-} from 'react-native';
-import { GestureHandler, DangerZone } from 'expo';
-const { Animated } = DangerZone;
+} from 'react-native'
+import { GestureHandler, DangerZone } from 'expo'
+const { Animated } = DangerZone
 // even better https://github.com/kmagiera/react-native-reanimated/blob/master/Example/PanRotateAndZoom/index.js
 
-const { PanGestureHandler, State, PinchGestureHandler } = GestureHandler;
+const { PanGestureHandler, State, PinchGestureHandler } = GestureHandler
 const {
   add,
   cond,
@@ -17,7 +17,7 @@ const {
   eq,
   set,
   multiply
-} = Animated;
+} = Animated
 
 export default class Task1 extends React.Component {
   static navigationOptions = {
@@ -28,31 +28,33 @@ export default class Task1 extends React.Component {
   translateY = new Animated.Value(0);
   prevX = new Animated.Value(0);
   prevY = new Animated.Value(0);
+  panState = new Animated.Value(0);
 
-  onGestureEvent = Animated.event(
+  onPanEvent = Animated.event(
     [
       {
         nativeEvent: {
           translationX: this.translateX,
           translationY: this.translateY,
+          state: panState,
         },
       },
     ],
   );
 
   onHandlerStateChange = event([
-      {
-        nativeEvent: ({ oldState, translationX, translationY }) =>
-          cond(eq(oldState, State.ACTIVE),
-            [
-              set(this.prevX, add(this.prevX, translationX)),
-              set(this.prevY, add(this.prevY, translationY)),
-              set(this.translateX, 0),
-              set(this.translateY, 0)
-            ]
-          )
-      }
-    ])
+    {
+      nativeEvent: ({ oldState, translationX, translationY }) =>
+        cond(eq(oldState, State.ACTIVE),
+          [
+            set(this.prevX, add(this.prevX, translationX)),
+            set(this.prevY, add(this.prevY, translationY)),
+            set(this.translateX, 0),
+            set(this.translateY, 0)
+          ]
+        )
+    }
+  ])
 
 
   baseScale = new Animated.Value(1);
@@ -91,8 +93,8 @@ export default class Task1 extends React.Component {
             <PanGestureHandler
               ref={this.pan}
               simultaneousHandlers={this.pinch}
-              onGestureEvent={this.onGestureEvent}
-              onHandlerStateChange={this.onHandlerStateChange}
+              onGestureEvent={this.onPanEvent}
+              onHandlerStateChange={this.onPanEvent}
             >
               <Animated.View
                 style={[
@@ -115,7 +117,7 @@ export default class Task1 extends React.Component {
           </Animated.View>
         </PinchGestureHandler>
       </View>
-    );
+    )
   }
 }
 
@@ -213,4 +215,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#2e78b7',
   },
-});
+})

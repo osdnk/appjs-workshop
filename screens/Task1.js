@@ -1,13 +1,9 @@
-import React from 'react';
-import {
-  Animated,
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
-import { GestureHandler } from 'expo';
-const  { PanGestureHandler, State } = GestureHandler;
+import React from 'react'
+import { Animated, Platform, StyleSheet, Text, View, } from 'react-native'
+import { GestureHandler } from 'expo'
+import { CliectSays } from './ClientSays'
+
+const  { PanGestureHandler, State } = GestureHandler
 export default class Task1 extends React.Component {
   static navigationOptions = {
     header: null,
@@ -30,10 +26,12 @@ export default class Task1 extends React.Component {
     { useNativeDriver: true }
   );
 
-  onHandlerStateChange = ({ nativeEvent: { oldState, translationX, translationY }}) => {
+  onHandlerStateChange = ({ nativeEvent:
+    { oldState, translationX, translationY }
+  }) => {
     if (oldState === State.ACTIVE) {
-      this.prevX += translationX;
-      this.prevY += translationY;
+      this.prevX += translationX
+      this.prevY += translationY
       this.translateX.setValue(0)
       this.translateY.setValue(0)
       this.translateX.setOffset(this.prevX)
@@ -44,6 +42,7 @@ export default class Task1 extends React.Component {
   render() {
     return (
       <View style={styles.container}>
+        <CliectSays text="HELOOOO"/>
         <PanGestureHandler
           onGestureEvent={this.onGestureEvent}
           onHandlerStateChange={this.onHandlerStateChange}
@@ -65,7 +64,7 @@ export default class Task1 extends React.Component {
           </Animated.View>
         </PanGestureHandler>
       </View>
-    );
+    )
   }
 }
 
@@ -163,4 +162,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#2e78b7',
   },
-});
+})
