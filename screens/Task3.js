@@ -65,32 +65,11 @@ export default class Task1 extends React.Component {
     ]);
 
 
-  baseScale = new Animated.Value(1);
-  pinchScale = new Animated.Value(1);
-  lastScale = 1;
-  onPinchGestureEvent = event(
-    [{ nativeEvent: { scale: this.pinchScale } }]
-  );
-
-  onPinchHandlerStateChange = event([
-    {
-      nativeEvent: ({ oldState, scale }) =>
-        cond(eq(oldState, State.ACTIVE),
-          [
-            set(this.baseScale, multiply(this.baseScale, scale)),
-            set(this.pinchScale, 1),
-          ]
-        )
-    }
-  ]);
-
-
-
   pinch = React.createRef();
   pan = React.createRef();
 
   render() {
-    const size = multiply(this.baseScale, this.pinchScale, 100)
+    // const size = multiply(this.baseScale, this.pinchScale, 100)
     return (
       <View style={styles.container}>
         <CliectSays
@@ -101,8 +80,6 @@ export default class Task1 extends React.Component {
         <PinchGestureHandler
           ref={this.pinch}
           simultaneousHandlers={this.ref}
-          onGestureEvent={this.onPinchGestureEvent}
-          onHandlerStateChange={this.onPinchHandlerStateChange}
         >
           <Animated.View>
             <PanGestureHandler
@@ -114,10 +91,6 @@ export default class Task1 extends React.Component {
               <Animated.View
                 style={[
                   styles.box,
-                  {
-                    height: size,
-                    width: size
-                  },
                   {
                     transform: [
                       { translateX: this.transX },
