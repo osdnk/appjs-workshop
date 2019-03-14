@@ -12,7 +12,7 @@ const {
 
 const { set, cond, block, eq, add, and, sqrt, Value, spring, or, divide, greaterThan, sub,event, diff, multiply, clockRunning, startClock, stopClock, decay, Clock, lessThan } = Animated
 
-function withEnhancedLimits(val, min, max, state) {
+function withBouncyLimits(val, min, max, state) {
   const prev = new Animated.Value(0)
   const limitedVal = new Animated.Value(0)
   const flagWasRunSpring = new Animated.Value(0)
@@ -233,8 +233,8 @@ export default class Example extends Component {
       },
     ])
 
-    this.X = withEnhancedLimits(withDecaying(withPreservingAdditiveOffset(dragX, panState), panState), -100, 100, panState)
-    this.Y = withEnhancedLimits(withDecaying(withPreservingAdditiveOffset(dragY, panState), panState), -100, 100, panState)
+    this.X = withBouncyLimits(withDecaying(withPreservingAdditiveOffset(dragX, panState), panState), -100, 100, panState)
+    this.Y = withBouncyLimits(withDecaying(withPreservingAdditiveOffset(dragY, panState), panState), -100, 100, panState)
     this.scale = withLimits(withPreservingMultiplicativeOffset(scale, scaleState), 0.1, 2, scaleState)
   }
 
