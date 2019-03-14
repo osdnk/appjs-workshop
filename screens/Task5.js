@@ -68,7 +68,7 @@ function withPreservingAdditiveOffset(drag, state) {
   ])
 }
 
-function withDecaying(drag, state){
+function withDecaying(drag, state) {
   const valDecayed = new Animated.Value(0)
   const offset = new Animated.Value(0)
   const decayClock = new Clock()
@@ -93,7 +93,7 @@ function withDecaying(drag, state){
   ])
 }
 
-function withLimits(val, min, max, state){
+function withLimits(val, min, max, state) {
   const offset = new Animated.Value(0)
   const offsetedVal = add(offset, val)
   return block([

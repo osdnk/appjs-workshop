@@ -10,7 +10,7 @@ const {
   State,
 } = GestureHandler
 
-const { set, cond, block, eq, add, or, Value, call, sub,event, diff, multiply, debug, clockRunning, startClock, stopClock, decay, Clock } = Animated
+const { set, cond, block, eq, add, Value, sub,event, diff, multiply, clockRunning, startClock, stopClock, decay, Clock } = Animated
 
 function withPreservingOffset(drag, state) {
   const prev = new Animated.Value(0)
