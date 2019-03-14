@@ -12,6 +12,68 @@ const {
 
 const { set, cond, block, eq, add, and, sqrt, Value, spring, or, divide, greaterThan, sub,event, diff, multiply, clockRunning, startClock, stopClock, decay, Clock, lessThan } = Animated
 
+function withBouncyLimits(val, min, max, state) {
+  const prev = new Animated.Value(0)
+  const limitedVal = new Animated.Value(0)
+  const flagWasRunSpring = new Animated.Value(0)
+  const springClock = new Clock()
+  return block([
+    cond(eq(state, State.BEGAN),[
+      set(prev, val),
+      set(flagWasRunSpring, 0),
+      stopClock(springClock)
+    ], [
+      cond(or(and(eq(state, State.END), or(lessThan(limitedVal, min), greaterThan(limitedVal, max))), flagWasRunSpring),
+        [
+          set(flagWasRunSpring, 1),
+          cond(lessThan(limitedVal, min),
+            set(limitedVal, runSpring(springClock, limitedVal, diff(limitedVal), min))
+          ),
+          cond(greaterThan(limitedVal, max),
+            set(limitedVal, runSpring(springClock, limitedVal, diff(limitedVal), max))
+          ),
+        ],
+        [
+          set(limitedVal, add(limitedVal, sub(val, prev))),
+          cond(and(lessThan(limitedVal, min), lessThan(val, prev)),
+            // derivate of sqrt
+            [
+              // revert
+              set(limitedVal, add(limitedVal, sub(prev, val))),
+              // and use derivative of sqrt(x)
+              set(limitedVal,
+                sub(limitedVal,
+                  multiply(
+                    (divide(1, multiply(2, sqrt(sub(min, sub(limitedVal, sub(prev, val))))))),
+                    (sub(prev, val))
+                  )
+                )
+              ),
+            ]
+          ),
+          cond(and(greaterThan(limitedVal, max), greaterThan(val, prev)),
+            // derivate of sqrt
+            [
+              // revert
+              set(limitedVal, add(limitedVal, sub(prev, val))),
+              // and use derivative of sqrt(x)
+              set(limitedVal,
+                add(limitedVal,
+                  multiply(
+                    (divide(1, multiply(2, sqrt(sub(add(limitedVal, sub(val, prev)), max))))),
+                    (sub(val, prev))
+                  )
+                )
+              ),
+            ]
+          ),
+          set(prev, val),
+        ]
+      ),
+    ]),
+    limitedVal,
+  ])
+}
 
 function runDecay(clock, value, velocity, wasStartedFromBegin) {
   const state = {
@@ -171,8 +233,8 @@ export default class Example extends Component {
       },
     ])
 
-    this.X = withLimits(withDecaying(withPreservingAdditiveOffset(dragX, panState), panState), -100, 100, panState)
-    this.Y = withLimits(withDecaying(withPreservingAdditiveOffset(dragY, panState), panState), -100, 100, panState)
+    this.X = withBouncyLimits(withDecaying(withPreservingAdditiveOffset(dragX, panState), panState), -100, 100, panState)
+    this.Y = withBouncyLimits(withDecaying(withPreservingAdditiveOffset(dragY, panState), panState), -100, 100, panState)
     this.scale = withLimits(withPreservingMultiplicativeOffset(scale, scaleState), 0.1, 2, scaleState)
   }
 
