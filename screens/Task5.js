@@ -93,6 +93,19 @@ function withDecaying(drag, state) {
   ])
 }
 
+function withLimits(val, min, max, state) {
+  const offset = new Animated.Value(0)
+  const offsetedVal = add(offset, val)
+  return block([
+    cond(eq(state, State.BEGAN),[
+      cond(lessThan(offsetedVal, min),
+        set(offset, sub(min, val))),
+      cond(greaterThan(offsetedVal, max),
+        set(offset, sub(max, val)))
+    ]),
+    cond(lessThan(offsetedVal, min), min, cond(greaterThan(offsetedVal, max), max, offsetedVal))
+  ])
+}
 
 export default class Example extends Component {
   constructor(props) {
@@ -123,9 +136,9 @@ export default class Example extends Component {
       },
     ])
 
-    this.X = withDecaying(withPreservingAdditiveOffset(dragX, panState), panState)
-    this.Y = withDecaying(withPreservingAdditiveOffset(dragY, panState), panState)
-    this.scale = withPreservingMultiplicativeOffset(scale, scaleState)
+    this.X = withLimits(withDecaying(withPreservingAdditiveOffset(dragX, panState), panState), -100, 100, panState)
+    this.Y = withLimits(withDecaying(withPreservingAdditiveOffset(dragY, panState), panState), -100, 100, panState)
+    this.scale = withLimits(withPreservingMultiplicativeOffset(scale, scaleState), 0.1, 2, scaleState)
   }
 
   panRef = React.createRef();
