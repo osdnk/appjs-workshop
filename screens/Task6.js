@@ -188,7 +188,7 @@ export default class Example extends Component {
     return (
       <View style={styles.container}>
         <CliectSays
-          text="Hi! Hi! I know you're in hurry for your wife's birthday (best wished btw!)
+          text="Hi! Hi! I know you're in a hurry for your wife's birthday (best wished btw!)
           but there's one more feature I could find useful. I want component not to stop on meeting
           limits but to slow down (e.g. use sqrt of movement) and then slightly move to
           limits on finger released. It should be very easy for you! (deploy tomorrow btw but no pressure).

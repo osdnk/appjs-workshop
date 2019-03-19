@@ -41,7 +41,7 @@ export default class Task1 extends React.Component {
         <CliectSays
           text="Wow! Thanks. I think I need also to have this box resizeable.
           I mean I want to be able to pinch to zoom.
-          And maybe rotating with gesture? "
+          And maybe rotating with a gesture? "
         />
         <PanGestureHandler
           onGestureEvent={this.onPanGestureEvent}

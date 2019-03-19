@@ -141,7 +141,7 @@ export default class Example extends Component {
         <CliectSays
           text="Great, one moar thing I suppose before release tomorrow.
           I once more made some tweaks in code before release.
-          I could imagine a situation when user throws logo outside the screen.
+          I could imagine a situation when the user throws logo outside the screen.
           Or makes it too small and hardly invisible. I want to preserve it with some limits.
           Do you have some ideas? Btw release tomorrow but no pressure, did I said?"
         />
