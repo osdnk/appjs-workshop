@@ -59,7 +59,7 @@ function withDecaying (drag, state, velocity) {
   return block([
     cond(eq(state, State.END),
       [
-        set(valDecayed, runDecay(decayClock, add(drag, offset), velocity  , wasStartedFromBegin))
+        set(valDecayed, runDecay(decayClock, add(drag, offset), velocity , wasStartedFromBegin))
       ],
       [
         stopClock(decayClock),
