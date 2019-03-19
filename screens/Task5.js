@@ -68,7 +68,7 @@ function withPreservingAdditiveOffset(drag, state) {
   ])
 }
 
-function withDecaying(drag, state) {
+function withDecaying(drag, state, velocity) {
   const valDecayed = new Animated.Value(0)
   const offset = new Animated.Value(0)
   const decayClock = new Clock()
@@ -77,7 +77,7 @@ function withDecaying(drag, state) {
   return block([
     cond(eq(state, State.END),
       [
-        set(valDecayed, runDecay(decayClock, add(drag, offset), diff(drag), wasStartedFromBegin))
+        set(valDecayed, runDecay(decayClock, add(drag, offset), velocity, wasStartedFromBegin))
       ],
       [
         stopClock(decayClock),
@@ -102,6 +102,8 @@ export default class Example extends Component {
     const scale = new Value(1)
     const panState = new Value(0)
     const scaleState = new Value(0)
+    const velocityX = new Value(0)
+    const velocityY = new Value(0)
 
 
     this.handlePan = event([
@@ -109,7 +111,9 @@ export default class Example extends Component {
         nativeEvent: ({
           translationX: dragX,
           translationY: dragY,
-          state: panState
+          state: panState,
+          velocityY,
+          velocityX
         })
       },
     ])
@@ -123,8 +127,8 @@ export default class Example extends Component {
       },
     ])
 
-    this.X = withDecaying(withPreservingAdditiveOffset(dragX, panState), panState)
-    this.Y = withDecaying(withPreservingAdditiveOffset(dragY, panState), panState)
+    this.X = withDecaying(withPreservingAdditiveOffset(dragX, panState), panState, velocityX)
+    this.Y = withDecaying(withPreservingAdditiveOffset(dragY, panState), panState, velocityY)
     this.scale = withPreservingMultiplicativeOffset(scale, scaleState)
   }
 
