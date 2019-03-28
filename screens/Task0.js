@@ -51,7 +51,7 @@ export default class Task0 extends React.Component {
             perferendis doloribus asperiores repellat.
           </MonoText>
         </ScrollView>
-        <View style={[styles.box, { transform: [{ translateY: this.state.trans }]}]}/>
+        <Animated.View style={[styles.box, { transform: [{ translateY: this.state.trans }]}]}/>
       </View>
     )
   }
