@@ -6,10 +6,18 @@ import { MonoText } from '../components/StyledText'
 
 const  { PanGestureHandler, State } = GestureHandler
 export default class Task0 extends React.Component {
+  state = {
+    trans: 0
+  }
   render() {
     return (
       <View style={styles.container}>
-        <ScrollView>
+        <ScrollView
+          scrollEventThrottle={16}
+          onScroll={({ nativeEvent: { contentOffset:  { y } } }) => this.setState({
+            trans: y
+          })}
+        >
           <MonoText>
             At vero eos et accusamus et iusto odio dignissimos
             ducimus qui blanditiis praesentium voluptatum deleniti
@@ -45,7 +53,7 @@ export default class Task0 extends React.Component {
             perferendis doloribus asperiores repellat.
           </MonoText>
         </ScrollView>
-        <View style={styles.box}/>
+        <View style={[styles.box, { marginLeft: this.state.trans }]}/>
       </View>
     )
   }
