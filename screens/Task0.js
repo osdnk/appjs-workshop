@@ -12,8 +12,8 @@ export default class Task0 extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <ScrollView
-          scrollEventThrottle={16}
+        <Animated.ScrollView
+          scrollEventThrottle={1}
           onScroll={Animated.event([
             {
               nativeEvent: {
@@ -21,9 +21,10 @@ export default class Task0 extends React.Component {
                   y: this.state.trans
                 }
               },
-             useNativeDriver: true
-          },
-          ])}
+            }
+          ],
+          { useNativeDriver: true }
+          )}
         >
           <MonoText>
             At vero eos et accusamus et iusto odio dignissimos
@@ -59,7 +60,7 @@ export default class Task0 extends React.Component {
             reiciendis voluptatibus maiores alias consequatur aut
             perferendis doloribus asperiores repellat.
           </MonoText>
-        </ScrollView>
+        </Animated.ScrollView>
         <Animated.View style={[styles.box, { transform: [{ translateX: this.state.trans }]}]}/>
       </View>
     )
