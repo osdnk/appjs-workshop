@@ -20,8 +20,9 @@ export default class Task0 extends React.Component {
                 contentOffset: {
                   y: this.state.trans
                 }
-              }
-            }
+              },
+             useNativeDriver: true
+          },
           ])}
         >
           <MonoText>
