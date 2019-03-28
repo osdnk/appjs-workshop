@@ -14,7 +14,15 @@ export default class Task0 extends React.Component {
       <View style={styles.container}>
         <ScrollView
           scrollEventThrottle={16}
-          onScroll={({ nativeEvent: { contentOffset: { y } } }) => this.state.setValue(y)}
+          onScroll={Animated.event([
+            {
+              nativeEvent: {
+                contentOffset: {
+                  y: this.state.trans
+                }
+              }
+            }
+          ])}
         >
           <MonoText>
             At vero eos et accusamus et iusto odio dignissimos
@@ -51,7 +59,7 @@ export default class Task0 extends React.Component {
             perferendis doloribus asperiores repellat.
           </MonoText>
         </ScrollView>
-        <Animated.View style={[styles.box, { transform: [{ translateY: this.state.trans }]}]}/>
+        <Animated.View style={[styles.box, { transform: [{ translateX: this.state.trans }]}]}/>
       </View>
     )
   }
