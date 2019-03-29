@@ -159,27 +159,32 @@ export default class Example extends Component {
           simultaneousHandlers={[this.pinchRef]}
           onGestureEvent={this.handlePan}
           onHandlerStateChange={this.handlePan}>
-          <Animated.View>
+          <Animated.View
+            style={StyleSheet.absoluteFill}
+          >
             <PinchGestureHandler
               ref={this.pinchRef}
               simultaneousHandlers={[this.panRef]}
               onGestureEvent={this.handleZoom}
               onHandlerStateChange={this.handleZoom}>
-
-              <Animated.Image
-                resizeMode="contain"
-                style={[
-                  styles.box,
-                  {
-                    transform: [
-                      { translateX: this.X },
-                      { translateY: this.Y },
-                      { scale: this.scale },
-                    ],
-                  },
-                ]}
-                source={require('./react-hexagon.png')}
-              />
+              <Animated.View
+                style={[StyleSheet.absoluteFill, styles.container]}
+              >
+                <Animated.Image
+                  resizeMode="contain"
+                  style={[
+                    styles.box,
+                    {
+                      transform: [
+                        { translateX: this.X },
+                        { translateY: this.Y },
+                        { scale: this.scale },
+                      ],
+                    },
+                  ]}
+                  source={require('./react-hexagon.png')}
+                />
+              </Animated.View>
             </PinchGestureHandler>
           </Animated.View>
         </PanGestureHandler>
