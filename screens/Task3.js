@@ -103,7 +103,9 @@ export default class Task1 extends React.Component {
           onGestureEvent={this.onPinchGestureEvent}
           onHandlerStateChange={this.onPinchHandlerStateChange}
         >
-          <Animated.View>
+          <Animated.View
+            style={StyleSheet.absoluteFill}
+          >
             <PanGestureHandler
               ref={this.pan}
               simultaneousHandlers={this.pinch}
@@ -111,23 +113,27 @@ export default class Task1 extends React.Component {
               onHandlerStateChange={this.onPanEvent}
             >
               <Animated.View
-                style={[
-                  styles.box,
-                  {
-                    height: size,
-                    width: size
-                  },
-                  {
-                    transform: [
-                      { translateX: this.transX },
-                      { translateY: this.transY },
-                    ],
-                  }
-                ]}
+                style={[StyleSheet.absoluteFill, styles.container]}
               >
-                <MonoText>
-                  Thinking inside the box
-                </MonoText>
+                <Animated.View
+                  style={[
+                    styles.box,
+                    {
+                      height: size,
+                      width: size
+                    },
+                    {
+                      transform: [
+                        { translateX: this.transX },
+                        { translateY: this.transY },
+                      ],
+                    }
+                  ]}
+                >
+                  <MonoText>
+                    Thinking inside the box
+                  </MonoText>
+                </Animated.View>
               </Animated.View>
             </PanGestureHandler>
           </Animated.View>
