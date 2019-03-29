@@ -86,42 +86,52 @@ export default class Task1 extends React.Component {
           I mean I want to be able to pinch to zoom.
           And maybe rotating with gesture? "
         />
-        <RotationGestureHandler
-          ref={this.rotate}
-          simultaneousHandlers={[this.pan, this.pinch]}
-          onGestureEvent={this.onRotationGestureEvent}
-          onHandlerStateChange={this.onRotationHandlerStateChange}>
-          <Animated.View>
+        <PanGestureHandler
+          ref={this.pan}
+          simultaneousHandlers={[this.pinch, this.rotate]}
+          onGestureEvent={this.onPanGestureEvent}
+          onHandlerStateChange={this.onPanHandlerStateChange}
+          avgTouches
+        >
+
+          <Animated.View
+            style={StyleSheet.absoluteFill}
+          >
             <PinchGestureHandler
               ref={this.pinch}
               simultaneousHandlers={[this.rotate, this.pinch]}
               onGestureEvent={this.onPinchGestureEvent}
               onHandlerStateChange={this.onPinchHandlerStateChange}>
-              <Animated.View>
-                <PanGestureHandler
-                  ref={this.pan}
-                  simultaneousHandlers={[this.pinch, this.rotate]}
-                  onGestureEvent={this.onPanGestureEvent}
-                  onHandlerStateChange={this.onPanHandlerStateChange}
-                >
+              <Animated.View
+                style={StyleSheet.absoluteFill}
+              >
+                <RotationGestureHandler
+                  ref={this.rotate}
+                  simultaneousHandlers={[this.pan, this.pinch]}
+                  onGestureEvent={this.onRotationGestureEvent}
+                  onHandlerStateChange={this.onRotationHandlerStateChange}>
+                  <Animated.View
+                    style={[StyleSheet.absoluteFill, styles.container]}
+                  >
                   <Animated.View
                     style={[
                       styles.box,
                       {
                         transform: [
                           { rotate: this.rotationString },
-                          { scale: this.scale },
                           { translateX: this.translateX },
                           { translateY: this.translateY },
+                          { scale: this.scale },
                         ],
                       }
                     ]}
                   />
-                </PanGestureHandler>
+                  </Animated.View>
+                </RotationGestureHandler>
               </Animated.View>
             </PinchGestureHandler>
           </Animated.View>
-        </RotationGestureHandler>
+        </PanGestureHandler>
       </View>
     )
   }
