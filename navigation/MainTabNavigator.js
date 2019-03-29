@@ -44,4 +44,6 @@ export default createBottomTabNavigator({
   Task4: enhance(Task4, 'Task 4'),
   Task5: enhance(Task5, 'Task 5'),
   Task6: enhance(Task6, 'Task 6'),
+}, {
+  initialRouteName: 'Task0',
 })
