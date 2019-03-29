@@ -119,6 +119,10 @@ export default class Task1 extends React.Component {
                   style={[
                     styles.box,
                     {
+                      width: size,
+                      height: size
+                    },
+                    {
                       transform: [
                         { translateX: this.transX },
                         { translateY: this.transY },
