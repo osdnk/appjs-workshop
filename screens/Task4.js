@@ -26,54 +26,6 @@ function withPreservingOffset(drag, state) {
   ])
 }
 
-function runDecay(clock, value, velocity, wasStartedFromBegin) {
-  const state = {
-    finished: new Value(0),
-    velocity: new Value(0),
-    position: new Value(0),
-    time: new Value(0),
-  }
-  const config = { deceleration: 0.99 }
-  return [
-    cond(clockRunning(clock), 0, [
-      cond(wasStartedFromBegin, 0, [
-        set(wasStartedFromBegin, 1),
-        set(state.finished, 0),
-        set(state.velocity, velocity),
-        set(state.position, value),
-        set(state.time, 0),
-        startClock(clock),
-      ]),
-    ]),
-    decay(clock, state, config),
-    cond(state.finished, stopClock(clock)),
-    state.position,
-  ]
-}
-
-function withDecaying (drag, state) {
-  const valDecayed = new Animated.Value(0)
-  const offset = new Animated.Value(0)
-  const decayClock = new Clock()
-  const wasStartedFromBegin = new Animated.Value(0)
-  return block([
-    cond(eq(state, State.END),
-      [
-        set(valDecayed, runDecay(decayClock, add(drag, offset), diff(drag), wasStartedFromBegin))
-      ],
-      [
-        cond(eq(state, State.BEGAN), [
-          set(wasStartedFromBegin, 0),
-          set(offset, add(sub(valDecayed, drag)))
-        ]),
-        set(valDecayed, add(drag, offset))
-
-      ],
-    ),
-    valDecayed,
-  ])
-}
-
 export default class Example extends Component {
   constructor(props) {
     super(props)
@@ -106,8 +58,8 @@ export default class Example extends Component {
       },
     ])
 
-    this.X = withDecaying(withPreservingOffset(dragX, panState), panState)
-    this.Y = withDecaying(withPreservingOffset(dragY, panState), panState)
+    this.X = withPreservingOffset(dragX, panState)
+    this.Y = withPreservingOffset(dragY, panState)
   }
 
   panRef = React.createRef();
@@ -118,22 +70,28 @@ export default class Example extends Component {
       <View style={styles.container}>
         <CliectSays
           text="Hey, do you know who am I? I'm your nightmare.
-          I'm client who helps you writing code? I've changed everything you done.
+          I'm a client who helps you writing code! I've changed everything you have done.
           I made this React logo draggable and zoomable but I think it's not very
           natural to make it stop immediately as only we drop the finger.
           Could we make it stops slowly with friction?"
         />
         <PanGestureHandler
+          avgTouches
           ref={this.panRef}
           simultaneousHandlers={[this.pinchRef]}
           onGestureEvent={this.handlePan}
           onHandlerStateChange={this.handlePan}>
-          <Animated.View>
+          <Animated.View
+              style={StyleSheet.absoluteFill}
+          >
             <PinchGestureHandler
               ref={this.pinchRef}
               simultaneousHandlers={[this.panRef]}
               onGestureEvent={this.handleZoom}
               onHandlerStateChange={this.handleZoom}>
+              <Animated.View
+                style={[StyleSheet.absoluteFill, styles.container]}
+              >
 
               <Animated.Image
                 resizeMode="contain"
@@ -149,6 +107,7 @@ export default class Example extends Component {
                 ]}
                 source={require('./react-hexagon.png')}
               />
+              </Animated.View>
             </PinchGestureHandler>
           </Animated.View>
         </PanGestureHandler>

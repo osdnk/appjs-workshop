@@ -34,7 +34,7 @@ export default class Task1 extends React.Component {
         },
       },
     ],
-  );
+  )
 
   transX =
     block([
@@ -48,7 +48,7 @@ export default class Task1 extends React.Component {
           set(this.translateX, 0)
         ]),
       add(this.translateX, this.prevX)
-    ]);
+    ])
 
   transY =
     block([
@@ -62,14 +62,14 @@ export default class Task1 extends React.Component {
           set(this.translateY, 0)
         ]),
       add(this.translateY, this.prevY)
-    ]);
+    ])
 
 
   baseScale = new Animated.Value(1);
   pinchScale = new Animated.Value(1);
   onPinchGestureEvent = event(
     [{ nativeEvent: { scale: this.pinchScale } }]
-  );
+  )
 
   onPinchHandlerStateChange = event([
     {
@@ -81,7 +81,7 @@ export default class Task1 extends React.Component {
           ]
         )
     }
-  ]);
+  ])
 
 
 
@@ -118,10 +118,6 @@ export default class Task1 extends React.Component {
                 <Animated.View
                   style={[
                     styles.box,
-                    {
-                      height: size,
-                      width: size
-                    },
                     {
                       transform: [
                         { translateX: this.transX },
