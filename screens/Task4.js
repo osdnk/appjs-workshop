@@ -76,16 +76,22 @@ export default class Example extends Component {
           Could we make it stops slowly with friction?"
         />
         <PanGestureHandler
+          avgTouches
           ref={this.panRef}
           simultaneousHandlers={[this.pinchRef]}
           onGestureEvent={this.handlePan}
           onHandlerStateChange={this.handlePan}>
-          <Animated.View>
+          <Animated.View
+              style={StyleSheet.absoluteFill}
+          >
             <PinchGestureHandler
               ref={this.pinchRef}
               simultaneousHandlers={[this.panRef]}
               onGestureEvent={this.handleZoom}
               onHandlerStateChange={this.handleZoom}>
+              <Animated.View
+                style={[StyleSheet.absoluteFill, styles.container]}
+              >
 
               <Animated.Image
                 resizeMode="contain"
@@ -101,6 +107,7 @@ export default class Example extends Component {
                 ]}
                 source={require('./react-hexagon.png')}
               />
+              </Animated.View>
             </PinchGestureHandler>
           </Animated.View>
         </PanGestureHandler>
