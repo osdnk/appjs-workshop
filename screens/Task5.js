@@ -68,7 +68,7 @@ function withPreservingAdditiveOffset(drag, state) {
   ])
 }
 
-function withDecaying(drag, state) {
+function withDecaying(drag, state, velocity) {
   const valDecayed = new Animated.Value(0)
   const offset = new Animated.Value(0)
   const decayClock = new Clock()
@@ -77,7 +77,7 @@ function withDecaying(drag, state) {
   return block([
     cond(eq(state, State.END),
       [
-        set(valDecayed, runDecay(decayClock, add(drag, offset), diff(drag), wasStartedFromBegin))
+        set(valDecayed, runDecay(decayClock, add(drag, offset), velocity, wasStartedFromBegin))
       ],
       [
         stopClock(decayClock),
@@ -115,6 +115,8 @@ export default class Example extends Component {
     const scale = new Value(1)
     const panState = new Value(0)
     const scaleState = new Value(0)
+    const velocityX = new Value(0)
+    const velocityY = new Value(0)
 
 
     this.handlePan = event([
@@ -122,7 +124,9 @@ export default class Example extends Component {
         nativeEvent: ({
           translationX: dragX,
           translationY: dragY,
-          state: panState
+          state: panState,
+          velocityY,
+          velocityX
         })
       },
     ])
@@ -136,8 +140,8 @@ export default class Example extends Component {
       },
     ])
 
-    this.X = withLimits(withDecaying(withPreservingAdditiveOffset(dragX, panState), panState), -100, 100, panState)
-    this.Y = withLimits(withDecaying(withPreservingAdditiveOffset(dragY, panState), panState), -100, 100, panState)
+    this.X = withLimits(withDecaying(withPreservingAdditiveOffset(dragX, panState), panState, velocityX), -100, 100, panState)
+    this.Y = withLimits(withDecaying(withPreservingAdditiveOffset(dragY, panState), panState, velocityY), -100, 100, panState)
     this.scale = withLimits(withPreservingMultiplicativeOffset(scale, scaleState), 0.1, 2, scaleState)
   }
 
@@ -150,7 +154,7 @@ export default class Example extends Component {
         <CliectSays
           text="Great, one moar thing I suppose before release tomorrow.
           I once more made some tweaks in code before release.
-          I could imagine a situation when user throws logo outside the screen.
+          I could imagine a situation when the user throws logo outside the screen.
           Or makes it too small and hardly invisible. I want to preserve it with some limits.
           Do you have some ideas? Btw release tomorrow but no pressure, did I said?"
         />

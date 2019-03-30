@@ -10,7 +10,7 @@ export default class Task1 extends React.Component {
       <View style={styles.container}>
         <CliectSays
           text="Hello friend! Could you see the yellow box below?
-          It will be some super component some day but now I want to make
+          It will be some super component someday but now I want to make
           it draggable. Could you help me?"
         />
         <View style={styles.box}/>

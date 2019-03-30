@@ -70,22 +70,28 @@ export default class Example extends Component {
       <View style={styles.container}>
         <CliectSays
           text="Hey, do you know who am I? I'm your nightmare.
-          I'm client who helps you writing code? I've changed everything you done.
+          I'm a client who helps you writing code! I've changed everything you have done.
           I made this React logo draggable and zoomable but I think it's not very
           natural to make it stop immediately as only we drop the finger.
           Could we make it stops slowly with friction?"
         />
         <PanGestureHandler
+          avgTouches
           ref={this.panRef}
           simultaneousHandlers={[this.pinchRef]}
           onGestureEvent={this.handlePan}
           onHandlerStateChange={this.handlePan}>
-          <Animated.View>
+          <Animated.View
+              style={StyleSheet.absoluteFill}
+          >
             <PinchGestureHandler
               ref={this.pinchRef}
               simultaneousHandlers={[this.panRef]}
               onGestureEvent={this.handleZoom}
               onHandlerStateChange={this.handleZoom}>
+              <Animated.View
+                style={[StyleSheet.absoluteFill, styles.container]}
+              >
 
               <Animated.Image
                 resizeMode="contain"
@@ -101,6 +107,7 @@ export default class Example extends Component {
                 ]}
                 source={require('./react-hexagon.png')}
               />
+              </Animated.View>
             </PinchGestureHandler>
           </Animated.View>
         </PanGestureHandler>
