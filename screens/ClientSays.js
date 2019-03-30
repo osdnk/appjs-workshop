@@ -36,6 +36,7 @@ export class CliectSays extends React.Component {
       <TouchableOpacity
         style={{
           position: 'absolute',
+          zIndex: 1,
           top: 32,
           flexDirection: 'row',
           paddingHorizontal: 16,
