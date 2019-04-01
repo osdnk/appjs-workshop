@@ -113,19 +113,19 @@ export default class Task1 extends React.Component {
                   <Animated.View
                     style={[StyleSheet.absoluteFill, styles.container]}
                   >
-                  <Animated.View
-                    style={[
-                      styles.box,
-                      {
-                        transform: [
-                          { rotate: this.rotationString },
-                          { translateX: this.translateX },
-                          { translateY: this.translateY },
-                          { scale: this.scale },
-                        ],
-                      }
-                    ]}
-                  />
+                    <Animated.View
+                      style={[
+                        styles.box,
+                        {
+                          transform: [
+                            { rotate: this.rotationString },
+                            { translateX: this.translateX },
+                            { translateY: this.translateY },
+                            { scale: this.scale },
+                          ],
+                        }
+                      ]}
+                    />
                   </Animated.View>
                 </RotationGestureHandler>
               </Animated.View>

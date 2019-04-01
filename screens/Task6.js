@@ -12,68 +12,6 @@ const {
 
 const { set, cond, block, eq, add, and, sqrt, Value, spring, or, divide, greaterThan, sub,event, diff, multiply, clockRunning, startClock, stopClock, decay, Clock, lessThan } = Animated
 
-function withBouncyLimits(val, min, max, state) {
-  const prev = new Animated.Value(0)
-  const limitedVal = new Animated.Value(0)
-  const flagWasRunSpring = new Animated.Value(0)
-  const springClock = new Clock()
-  return block([
-    cond(eq(state, State.BEGAN),[
-      set(prev, val),
-      set(flagWasRunSpring, 0),
-      stopClock(springClock)
-    ], [
-      cond(or(and(eq(state, State.END), or(lessThan(limitedVal, min), greaterThan(limitedVal, max))), flagWasRunSpring),
-        [
-          set(flagWasRunSpring, 1),
-          cond(lessThan(limitedVal, min),
-            set(limitedVal, runSpring(springClock, limitedVal, diff(limitedVal), min))
-          ),
-          cond(greaterThan(limitedVal, max),
-            set(limitedVal, runSpring(springClock, limitedVal, diff(limitedVal), max))
-          ),
-        ],
-        [
-          set(limitedVal, add(limitedVal, sub(val, prev))),
-          cond(and(lessThan(limitedVal, min), lessThan(val, prev)),
-            // derivate of sqrt
-            [
-              // revert
-              set(limitedVal, add(limitedVal, sub(prev, val))),
-              // and use derivative of sqrt(x)
-              set(limitedVal,
-                sub(limitedVal,
-                  multiply(
-                    (divide(1, multiply(2, sqrt(sub(min, sub(limitedVal, sub(prev, val))))))),
-                    (sub(prev, val))
-                  )
-                )
-              ),
-            ]
-          ),
-          cond(and(greaterThan(limitedVal, max), greaterThan(val, prev)),
-            // derivate of sqrt
-            [
-              // revert
-              set(limitedVal, add(limitedVal, sub(prev, val))),
-              // and use derivative of sqrt(x)
-              set(limitedVal,
-                add(limitedVal,
-                  multiply(
-                    (divide(1, multiply(2, sqrt(sub(add(limitedVal, sub(val, prev)), max))))),
-                    (sub(val, prev))
-                  )
-                )
-              ),
-            ]
-          ),
-          set(prev, val),
-        ]
-      ),
-    ]),
-    limitedVal,
-  ])
-}
 
 function runDecay(clock, value, velocity, wasStartedFromBegin) {
   const state = {
@@ -131,7 +69,7 @@ function withPreservingAdditiveOffset(drag, state) {
   ])
 }
 
-function withDecaying(drag, state) {
+function withDecaying(drag, state, velocity) {
   const valDecayed = new Animated.Value(0)
   const offset = new Animated.Value(0)
   const decayClock = new Clock()
@@ -140,7 +78,7 @@ function withDecaying(drag, state) {
   return block([
     cond(eq(state, State.END),
       [
-        set(valDecayed, runDecay(decayClock, add(drag, offset), diff(drag), wasStartedFromBegin))
+        set(valDecayed, runDecay(decayClock, add(drag, offset), velocity, wasStartedFromBegin))
       ],
       [
         stopClock(decayClock),
@@ -212,6 +150,9 @@ export default class Example extends Component {
     const scale = new Value(1)
     const panState = new Value(0)
     const scaleState = new Value(0)
+    const velocityX = new Value(0)
+    const velocityY = new Value(0)
+
 
 
     this.handlePan = event([
@@ -219,7 +160,9 @@ export default class Example extends Component {
         nativeEvent: ({
           translationX: dragX,
           translationY: dragY,
-          state: panState
+          state: panState,
+          velocityY,
+          velocityX
         })
       },
     ])
@@ -233,8 +176,8 @@ export default class Example extends Component {
       },
     ])
 
-    this.X = withBouncyLimits(withDecaying(withPreservingAdditiveOffset(dragX, panState), panState), -100, 100, panState)
-    this.Y = withBouncyLimits(withDecaying(withPreservingAdditiveOffset(dragY, panState), panState), -100, 100, panState)
+    this.X = withLimits(withDecaying(withPreservingAdditiveOffset(dragX, panState), panState, velocityX), -100, 100, panState)
+    this.Y = withLimits(withDecaying(withPreservingAdditiveOffset(dragY, panState), panState, velocityY), -100, 100, panState)
     this.scale = withLimits(withPreservingMultiplicativeOffset(scale, scaleState), 0.1, 2, scaleState)
   }
 
@@ -245,8 +188,8 @@ export default class Example extends Component {
     return (
       <View style={styles.container}>
         <CliectSays
-          text="Hi! Hi! I know you're in hurry for your wife's birthday (best wished btw!)
-          but there's one more feature I could find useful. I want component to stop on meeting
+          text="Hi! Hi! I know you're in a hurry for your wife's birthday (best wished btw!)
+          but there's one more feature I could find useful. I want component not to stop on meeting
           limits but to slow down (e.g. use sqrt of movement) and then slightly move to
           limits on finger released. It should be very easy for you! (deploy tomorrow btw but no pressure).
           Cheers! "
@@ -256,27 +199,32 @@ export default class Example extends Component {
           simultaneousHandlers={[this.pinchRef]}
           onGestureEvent={this.handlePan}
           onHandlerStateChange={this.handlePan}>
-          <Animated.View>
+          <Animated.View
+            style={StyleSheet.absoluteFill}
+          >
             <PinchGestureHandler
               ref={this.pinchRef}
               simultaneousHandlers={[this.panRef]}
               onGestureEvent={this.handleZoom}
               onHandlerStateChange={this.handleZoom}>
-
-              <Animated.Image
-                resizeMode="contain"
-                style={[
-                  styles.box,
-                  {
-                    transform: [
-                      { translateX: this.X },
-                      { translateY: this.Y },
-                      { scale: this.scale },
-                    ],
-                  },
-                ]}
-                source={require('./react-hexagon.png')}
-              />
+              <Animated.View
+                style={[StyleSheet.absoluteFill, styles.container]}
+              >
+                <Animated.Image
+                  resizeMode="contain"
+                  style={[
+                    styles.box,
+                    {
+                      transform: [
+                        { translateX: this.X },
+                        { translateY: this.Y },
+                        { scale: this.scale },
+                      ],
+                    },
+                  ]}
+                  source={require('./react-hexagon.png')}
+                />
+              </Animated.View>
             </PinchGestureHandler>
           </Animated.View>
         </PanGestureHandler>

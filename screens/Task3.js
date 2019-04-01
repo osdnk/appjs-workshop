@@ -18,11 +18,11 @@ const {
 } = Animated
 
 export default class Task1 extends React.Component {
-  translateX = new Animated.Value(0);
-  translateY = new Animated.Value(0);
-  prevX = new Animated.Value(0);
-  prevY = new Animated.Value(0);
-  panState = new Animated.Value(0);
+  translateX = new Animated.Value(0)
+  translateY = new Animated.Value(0)
+  prevX = new Animated.Value(0)
+  prevY = new Animated.Value(0)
+  panState = new Animated.Value(0)
 
   onPanEvent = Animated.event(
     [
@@ -34,7 +34,7 @@ export default class Task1 extends React.Component {
         },
       },
     ],
-  );
+  )
 
   transX =
     block([
@@ -48,7 +48,7 @@ export default class Task1 extends React.Component {
           set(this.translateX, 0)
         ]),
       add(this.translateX, this.prevX)
-    ]);
+    ])
 
   transY =
     block([
@@ -62,35 +62,14 @@ export default class Task1 extends React.Component {
           set(this.translateY, 0)
         ]),
       add(this.translateY, this.prevY)
-    ]);
+    ])
 
 
-  baseScale = new Animated.Value(1);
-  pinchScale = new Animated.Value(1);
-  lastScale = 1;
-  onPinchGestureEvent = event(
-    [{ nativeEvent: { scale: this.pinchScale } }]
-  );
-
-  onPinchHandlerStateChange = event([
-    {
-      nativeEvent: ({ oldState, scale }) =>
-        cond(eq(oldState, State.ACTIVE),
-          [
-            set(this.baseScale, multiply(this.baseScale, scale)),
-            set(this.pinchScale, 1),
-          ]
-        )
-    }
-  ]);
-
-
-
-  pinch = React.createRef();
-  pan = React.createRef();
+  pinch = React.createRef()
+  pan = React.createRef()
 
   render() {
-    const size = multiply(this.baseScale, this.pinchScale, 100)
+    // const size = multiply(this.baseScale, this.pinchScale, 100)
     return (
       <View style={styles.container}>
         <CliectSays
@@ -101,10 +80,10 @@ export default class Task1 extends React.Component {
         <PinchGestureHandler
           ref={this.pinch}
           simultaneousHandlers={this.ref}
-          onGestureEvent={this.onPinchGestureEvent}
-          onHandlerStateChange={this.onPinchHandlerStateChange}
         >
-          <Animated.View>
+          <Animated.View
+            style={StyleSheet.absoluteFill}
+          >
             <PanGestureHandler
               ref={this.pan}
               simultaneousHandlers={this.pinch}
@@ -112,23 +91,23 @@ export default class Task1 extends React.Component {
               onHandlerStateChange={this.onPanEvent}
             >
               <Animated.View
-                style={[
-                  styles.box,
-                  {
-                    height: size,
-                    width: size
-                  },
-                  {
-                    transform: [
-                      { translateX: this.transX },
-                      { translateY: this.transY },
-                    ],
-                  }
-                ]}
+                style={[StyleSheet.absoluteFill, styles.container]}
               >
-                <MonoText>
-                  Thinking inside the box
-                </MonoText>
+                <Animated.View
+                  style={[
+                    styles.box,
+                    {
+                      transform: [
+                        { translateX: this.transX },
+                        { translateY: this.transY },
+                      ],
+                    }
+                  ]}
+                >
+                  <MonoText>
+                    Thinking inside the box
+                  </MonoText>
+                </Animated.View>
               </Animated.View>
             </PanGestureHandler>
           </Animated.View>
