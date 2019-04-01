@@ -46,18 +46,36 @@ export default class Task1 extends React.Component {
         <PanGestureHandler
           onGestureEvent={this.onPanGestureEvent}
           onHandlerStateChange={this.onPanHandlerStateChange}
+          avgTouches
         >
+
           <Animated.View
-            style={[
-              styles.box,
-              {
-                transform: [
-                  { translateX: this.translateX },
-                  { translateY: this.translateY },
-                ],
-              }
-            ]}
-          />
+            style={StyleSheet.absoluteFill}
+          >
+            <PinchGestureHandler>
+              <Animated.View
+                style={StyleSheet.absoluteFill}
+              >
+                <RotationGestureHandler>
+                  <Animated.View
+                    style={[StyleSheet.absoluteFill, styles.container]}
+                  >
+                  <Animated.View
+                    style={[
+                      styles.box,
+                      {
+                        transform: [
+                          { translateX: this.translateX },
+                          { translateY: this.translateY },
+                        ],
+                      }
+                    ]}
+                  />
+                  </Animated.View>
+                </RotationGestureHandler>
+              </Animated.View>
+            </PinchGestureHandler>
+          </Animated.View>
         </PanGestureHandler>
       </View>
     )
