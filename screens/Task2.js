@@ -118,9 +118,9 @@ export default class Task1 extends React.Component {
                         styles.box,
                         {
                           transform: [
-                            { rotate: this.rotationString },
                             { translateX: this.translateX },
                             { translateY: this.translateY },
+                            { rotate: this.rotationString },
                             { scale: this.scale },
                           ],
                         }
