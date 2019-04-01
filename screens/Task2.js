@@ -41,23 +41,41 @@ export default class Task1 extends React.Component {
         <CliectSays
           text="Wow! Thanks. I think I need also to have this box resizeable.
           I mean I want to be able to pinch to zoom.
-          And maybe rotating with gesture? "
+          And maybe rotating with a gesture? "
         />
         <PanGestureHandler
           onGestureEvent={this.onPanGestureEvent}
           onHandlerStateChange={this.onPanHandlerStateChange}
+          avgTouches
         >
+
           <Animated.View
-            style={[
-              styles.box,
-              {
-                transform: [
-                  { translateX: this.translateX },
-                  { translateY: this.translateY },
-                ],
-              }
-            ]}
-          />
+            style={StyleSheet.absoluteFill}
+          >
+            <PinchGestureHandler>
+              <Animated.View
+                style={StyleSheet.absoluteFill}
+              >
+                <RotationGestureHandler>
+                  <Animated.View
+                    style={[StyleSheet.absoluteFill, styles.container]}
+                  >
+                  <Animated.View
+                    style={[
+                      styles.box,
+                      {
+                        transform: [
+                          { translateX: this.translateX },
+                          { translateY: this.translateY },
+                        ],
+                      }
+                    ]}
+                  />
+                  </Animated.View>
+                </RotationGestureHandler>
+              </Animated.View>
+            </PinchGestureHandler>
+          </Animated.View>
         </PanGestureHandler>
       </View>
     )

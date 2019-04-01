@@ -135,7 +135,7 @@ export default class Example extends Component {
           onGestureEvent={this.handlePan}
           onHandlerStateChange={this.handlePan}>
           <Animated.View
-              style={StyleSheet.absoluteFill}
+            style={StyleSheet.absoluteFill}
           >
             <PinchGestureHandler
               ref={this.pinchRef}
@@ -146,20 +146,20 @@ export default class Example extends Component {
                 style={[StyleSheet.absoluteFill, styles.container]}
               >
 
-              <Animated.Image
-                resizeMode="contain"
-                style={[
-                  styles.box,
-                  {
-                    transform: [
-                      { translateX: this.X },
-                      { translateY: this.Y },
-                      { scale: this.Z },
-                    ],
-                  },
-                ]}
-                source={require('./react-hexagon.png')}
-              />
+                <Animated.Image
+                  resizeMode="contain"
+                  style={[
+                    styles.box,
+                    {
+                      transform: [
+                        { translateX: this.X },
+                        { translateY: this.Y },
+                        { scale: this.Z },
+                      ],
+                    },
+                  ]}
+                  source={require('./react-hexagon.png')}
+                />
               </Animated.View>
             </PinchGestureHandler>
           </Animated.View>
