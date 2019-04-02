@@ -26,6 +26,28 @@ function withPreservingOffset(drag, state) {
   ])
 }
 
+function runDecay(clock, value, velocity) {
+  const state = {
+    finished: new Value(0),
+    velocity: new Value(0),
+    position: new Value(0),
+    time: new Value(0),
+  }
+  const config = { deceleration: 0.99 }
+  return [
+    cond(clockRunning(clock), 0, [
+      set(state.finished, 0),
+      set(state.velocity, velocity),
+      set(state.position, value),
+      set(state.time, 0),
+      startClock(clock),
+    ]),
+    decay(clock, state, config),
+    cond(state.finished, stopClock(clock)),
+    state.position,
+  ]
+}
+
 export default class Example extends Component {
   constructor(props) {
     super(props)
