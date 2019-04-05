@@ -35,15 +35,60 @@ export default class Task1 extends React.Component {
     }
   };
 
+  baseScale = new Animated.Value(1);
+  pinchScale = new Animated.Value(1);
+  scale = Animated.multiply(this.baseScale, this.pinchScale);
+  lastScale = 1;
+  onPinchGestureEvent = Animated.event(
+    [{ nativeEvent: { scale: this.pinchScale } }],
+    { useNativeDriver: true }
+  );
+
+  onPinchHandlerStateChange = event => {
+    if (event.nativeEvent.oldState === State.ACTIVE) {
+      this.lastScale *= event.nativeEvent.scale
+      this.baseScale.setValue(this.lastScale)
+      this.pinchScale.setValue(1)
+    }
+  };
+
+  baseRotation = new Animated.Value(0);
+  zoomRotation = new Animated.Value(0);
+  rotation = Animated.add(this.baseRotation, this.zoomRotation);
+  lastRotation = 0;
+  onRotationGestureEvent = Animated.event(
+    [{ nativeEvent: { rotation: this.zoomRotation } }],
+    { useNativeDriver: true }
+  );
+
+  rotationString = this.rotation.interpolate({
+    inputRange: [-100, 100],
+    outputRange: ['-100rad', '100rad'],
+  });
+
+  onRotationHandlerStateChange = event => {
+    if (event.nativeEvent.oldState === State.ACTIVE) {
+      this.lastRotation += event.nativeEvent.rotation
+      this.baseRotation.setValue(this.lastRotation)
+      this.zoomRotation.setValue(0)
+    }
+  };
+
+  pinch = React.createRef();
+  pan = React.createRef();
+  rotate = React.createRef();
+
   render() {
     return (
       <View style={styles.container}>
         <CliectSays
           text="Wow! Thanks. I think I need also to have this box resizeable.
           I mean I want to be able to pinch to zoom.
-          And maybe rotating with a gesture? "
+          And maybe rotating with gesture? "
         />
         <PanGestureHandler
+          ref={this.pan}
+          simultaneousHandlers={[this.pinch, this.rotate]}
           onGestureEvent={this.onPanGestureEvent}
           onHandlerStateChange={this.onPanHandlerStateChange}
           avgTouches
@@ -52,25 +97,35 @@ export default class Task1 extends React.Component {
           <Animated.View
             style={StyleSheet.absoluteFill}
           >
-            <PinchGestureHandler>
+            <PinchGestureHandler
+              ref={this.pinch}
+              simultaneousHandlers={[this.rotate, this.pinch]}
+              onGestureEvent={this.onPinchGestureEvent}
+              onHandlerStateChange={this.onPinchHandlerStateChange}>
               <Animated.View
                 style={StyleSheet.absoluteFill}
               >
-                <RotationGestureHandler>
+                <RotationGestureHandler
+                  ref={this.rotate}
+                  simultaneousHandlers={[this.pan, this.pinch]}
+                  onGestureEvent={this.onRotationGestureEvent}
+                  onHandlerStateChange={this.onRotationHandlerStateChange}>
                   <Animated.View
                     style={[StyleSheet.absoluteFill, styles.container]}
                   >
-                  <Animated.View
-                    style={[
-                      styles.box,
-                      {
-                        transform: [
-                          { translateX: this.translateX },
-                          { translateY: this.translateY },
-                        ],
-                      }
-                    ]}
-                  />
+                    <Animated.View
+                      style={[
+                        styles.box,
+                        {
+                          transform: [
+                            { translateX: this.translateX },
+                            { translateY: this.translateY },
+                            { rotate: this.rotationString },
+                            { scale: this.scale },
+                          ],
+                        }
+                      ]}
+                    />
                   </Animated.View>
                 </RotationGestureHandler>
               </Animated.View>
