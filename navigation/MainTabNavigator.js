@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from 'react-navigation'
 
 import TabBarIcon from '../components/TabBarIcon'
 import Task0 from '../screens/Task0'
+import Task0b from '../screens/Task0b'
 import Task1 from '../screens/Task1'
 import Task2 from '../screens/Task2'
 import Task3 from '../screens/Task3'
@@ -38,6 +39,7 @@ const enhance = (Component, name) => {
 
 export default createBottomTabNavigator({
   Task0: enhance(Task0, 'Task 0'),
+  Task0b: enhance(Task0b, 'Task 0b'),
   Task1: enhance(Task1, 'Task 1'),
   Task2: enhance(Task2, 'Task 2'),
   Task3: enhance(Task3, 'Task 3'),
