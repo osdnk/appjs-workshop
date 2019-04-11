@@ -55,7 +55,7 @@ function withPreservingOffset(drag, state) {
   ])
 }
 
-function runDecay(clock, value, velocity) {
+function runDecay(clock, value, velocity, wasStartedFromBegin) {
   const state = {
     finished: new Value(0),
     velocity: new Value(0),
@@ -65,16 +65,43 @@ function runDecay(clock, value, velocity) {
   const config = { deceleration: 0.99 }
   return [
     cond(clockRunning(clock), 0, [
-      set(state.finished, 0),
-      set(state.velocity, velocity),
-      set(state.position, value),
-      set(state.time, 0),
-      startClock(clock),
+      cond(wasStartedFromBegin, 0, [
+        set(wasStartedFromBegin, 1),
+        set(state.finished, 0),
+        set(state.velocity, velocity),
+        set(state.position, value),
+        set(state.time, 0),
+        startClock(clock),
+      ]),
     ]),
     decay(clock, state, config),
     cond(state.finished, stopClock(clock)),
     state.position,
   ]
+}
+
+function withDecaying (drag, state, velocity) {
+  const valDecayed = new Animated.Value(0)
+  const offset = new Animated.Value(0)
+  const decayClock = new Clock()
+  const wasStartedFromBegin = new Animated.Value(0)
+  return block([
+    cond(eq(state, State.END),
+      [
+        set(valDecayed, runDecay(decayClock, add(drag, offset), velocity , wasStartedFromBegin))
+      ],
+      [
+        stopClock(decayClock),
+        cond(eq(state, State.BEGAN), [
+          set(wasStartedFromBegin, 0),
+          set(offset, add(sub(valDecayed, drag)))
+        ]),
+        set(valDecayed, add(drag, offset))
+
+      ],
+    ),
+    valDecayed,
+  ])
 }
 
 export default class Example extends Component {
@@ -87,6 +114,8 @@ export default class Example extends Component {
     const dragX = new Value(0)
     const dragY = new Value(0)
     const panState = new Value(0)
+    const velocityX = new Value(0)
+    const velocityY = new Value(0)
 
 
     this.handlePan = event([
@@ -94,7 +123,9 @@ export default class Example extends Component {
         nativeEvent: ({
           translationX: dragX,
           translationY: dragY,
-          state: panState
+          state: panState,
+          velocityY,
+          velocityX
         })
       },
     ])
@@ -109,8 +140,8 @@ export default class Example extends Component {
       },
     ])
 
-    this.X = withPreservingOffset(dragX, panState)
-    this.Y = withPreservingOffset(dragY, panState)
+    this.X = withDecaying(withPreservingOffset(dragX, panState), panState, velocityX)
+    this.Y = withDecaying(withPreservingOffset(dragY, panState), panState, velocityY)
   }
 
   panRef = React.createRef();
@@ -121,7 +152,7 @@ export default class Example extends Component {
       <View style={styles.container}>
         <CliectSays
           text="Hey, do you know who am I? I'm your nightmare.
-          I'm a client who helps you writing code! I've changed everything you have done.
+          I'm client who helps you writing code? I've changed everything you done.
           I made this React logo draggable and zoomable but I think it's not very
           natural to make it stop immediately as only we drop the finger.
           Could we make it stops slowly with friction?"
@@ -133,7 +164,7 @@ export default class Example extends Component {
           onGestureEvent={this.handlePan}
           onHandlerStateChange={this.handlePan}>
           <Animated.View
-              style={StyleSheet.absoluteFill}
+            style={StyleSheet.absoluteFill}
           >
             <PinchGestureHandler
               ref={this.pinchRef}
@@ -144,20 +175,20 @@ export default class Example extends Component {
                 style={[StyleSheet.absoluteFill, styles.container]}
               >
 
-              <Animated.Image
-                resizeMode="contain"
-                style={[
-                  styles.box,
-                  {
-                    transform: [
-                      { translateX: this.X },
-                      { translateY: this.Y },
-                      { scale: this.Z },
-                    ],
-                  },
-                ]}
-                source={require('./react-hexagon.png')}
-              />
+                <Animated.Image
+                  resizeMode="contain"
+                  style={[
+                    styles.box,
+                    {
+                      transform: [
+                        { translateX: this.X },
+                        { translateY: this.Y },
+                        { scale: this.Z },
+                      ],
+                    },
+                  ]}
+                  source={require('./react-hexagon.png')}
+                />
               </Animated.View>
             </PinchGestureHandler>
           </Animated.View>
